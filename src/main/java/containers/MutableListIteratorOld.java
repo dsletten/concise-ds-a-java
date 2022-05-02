@@ -2,11 +2,11 @@ package containers;
 
 //    This should be MutableCollectionIterator!!
 //    Need MutableCollection interface?!
-public abstract class MutableListIterator<E> extends Iterator<E> {
+public abstract class MutableListIteratorOld<E> extends IteratorOld<E> {
     private MutableList<E> list;
     private int expectedModificationCount;
 
-    protected MutableListIterator(MutableList<E> list) {
+    protected MutableListIteratorOld(MutableList<E> list) {
         this.list = list;
         this.expectedModificationCount = list.getModificationCount();
     }

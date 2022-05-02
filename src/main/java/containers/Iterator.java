@@ -1,17 +1,47 @@
 package containers;
 
-public abstract class Iterator<E> {
-    public abstract boolean isDone();
+public class Iterator<E> {
+    public Cursor<E> cursor;
+
+    public Iterator(Cursor<E> cursor) {
+        this.cursor = cursor;
+    }
+
+    public final boolean isDone() {
+        return checkDone();
+    }
+
+    protected boolean checkDone() {
+        return cursor.isDone();
+    }
 
     public final E current() {
         if ( isDone() ) {
             throw new IllegalStateException("Iteration already finished");
         } else {
-            return doCurrent();
+            return currentElement();
         }
     }
 
-    protected abstract E doCurrent();
+    protected E currentElement() {
+        return cursor.current();
+    }
 
-    public abstract void next();
+    public final E next() {
+        if ( isDone() ) {
+            return null;
+        } else {
+            nextElement();
+
+            if ( isDone() ) {
+                return null;
+            } else {
+                return current();
+            }
+        }
+    }
+
+    protected void nextElement() {
+        cursor.advance();
+    }
 }

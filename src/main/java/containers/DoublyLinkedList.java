@@ -40,8 +40,32 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
+//    public Iterator<E> iterator() {
+//        return new DoublyLinkedListIterator();
+//    }
     public Iterator<E> iterator() {
-        return new DoublyLinkedListIterator();
+        return new MutableCollectionIterator<>(new Cursor<E>() {
+            private Dcons<E> node = store;
+            private boolean sealedForYourProtection = true;
+
+            @Override
+            public boolean isDone() {
+                return isEmpty() || (!sealedForYourProtection && node == store);
+            }
+
+            @Override
+            public E current() {
+                return node.getContent();
+            }
+
+            @Override
+            public void advance() {
+                if (!isDone()) {
+                    node = node.getNext();
+                    sealedForYourProtection = false;
+                }
+            }
+        }, () -> getModificationCount());
     }
 
     /*
@@ -245,22 +269,22 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected void doDoInsertBefore(Node<E> node, E obj) {
+    protected void doInsertBefore(Node<E> node, E obj) {
 
     }
 
     @Override
-    protected void doDoInsertAfter(Node<E> node, E obj) {
+    protected void doInsertAfter(Node<E> node, E obj) {
 
     }
 
     @Override
-    protected E doDoDeleteNode(Node<E> doomed) {
+    protected E doDeleteNode(Node<E> doomed) {
         return null;
     }
 
     @Override
-    protected E doDoDeleteChild(Node<E> parent) {
+    protected E doDeleteChild(Node<E> parent) {
         return null;
     }
 
@@ -530,28 +554,28 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
 //        }
     }
 
-    private class DoublyLinkedListIterator extends Iterator<E> {
-        private Dcons<E> node = store;
-        private boolean sealedForYourProtection = true;
-
-        @Override
-        public boolean isDone() {
-            return isEmpty()  ||  (!sealedForYourProtection  &&  node == store);
-        }
-
-        @Override
-        protected E doCurrent() {
-            return node.getContent();
-        }
-
-        @Override
-        public void next() {
-            if ( !isDone() ) {
-                node = node.getNext();
-                sealedForYourProtection = false;
-            }
-        }
-    }
+//    private class DoublyLinkedListIterator extends Iterator<E> {
+//        private Dcons<E> node = store;
+//        private boolean sealedForYourProtection = true;
+//
+//        @Override
+//        public boolean isDone() {
+//            return isEmpty()  ||  (!sealedForYourProtection  &&  node == store);
+//        }
+//
+//        @Override
+//        protected E doCurrent() {
+//            return node.getContent();
+//        }
+//
+//        @Override
+//        public void next() {
+//            if ( !isDone() ) {
+//                node = node.getNext();
+//                sealedForYourProtection = false;
+//            }
+//        }
+//    }
 
     private static int mod(int number, int divisor) {
         int rem = number % divisor;

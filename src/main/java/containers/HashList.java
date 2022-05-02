@@ -31,8 +31,28 @@ public class HashList<E> extends MutableList<E> {
     }
 
     @Override
+//    public Iterator<E> iterator() {
+//        return new RandomAccessListIterator();
+//    }
     public Iterator<E> iterator() {
-        return new RandomAccessListIterator();
+        return new MutableCollectionIterator<>(new Cursor<E>() {
+            private int cursor = 0;
+
+            @Override
+            public boolean isDone() {
+                return cursor == size();
+            }
+
+            @Override
+            public E current() {
+                return get(cursor);
+            }
+
+            @Override
+            public void advance() {
+                cursor++;
+            }
+        }, () -> getModificationCount());
     }
 
     @Override
@@ -111,32 +131,32 @@ public class HashList<E> extends MutableList<E> {
         return list;
     }
 
-    private class RandomAccessListIterator extends MutableListIterator<E> {
-        private int cursor = 0;
-
-        //    Shouldn't give access to enclosing list?!
-        //    Tension between inner class and code reuse!!
-        private RandomAccessListIterator() {
-            super(HashList.this);
-        }
-
-        @Override
-        protected boolean doIsDone() {
-            return cursor == size();
-        }
-
-        @Override
-        protected E doDoCurrent() {
-            return get(cursor);
-        }
-
-        @Override
-        protected void doNext() {
-            if ( !isDone() ) {
-                cursor++;
-            }
-        }
-    }
+//    private class RandomAccessListIterator extends MutableListIteratorOld<E> {
+//        private int cursor = 0;
+//
+//        //    Shouldn't give access to enclosing list?!
+//        //    Tension between inner class and code reuse!!
+//        private RandomAccessListIterator() {
+//            super(HashList.this);
+//        }
+//
+//        @Override
+//        protected boolean doIsDone() {
+//            return cursor == size();
+//        }
+//
+//        @Override
+//        protected E doDoCurrent() {
+//            return get(cursor);
+//        }
+//
+//        @Override
+//        protected void doNext() {
+//            if ( !isDone() ) {
+//                cursor++;
+//            }
+//        }
+//    }
 
     public static void main(String[] args) {
         List<Number> hl = new HashList<>();

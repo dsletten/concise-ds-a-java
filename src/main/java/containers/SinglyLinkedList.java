@@ -31,8 +31,49 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
+//    public Iterator<E> iterator() {
+//        return new SinglyLinkedListIterator();
+//    }
+//    public IteratorRC<E> iterator() {
+//        return new MutableCollectionIterator<E>(
+//                new RemoteControl<>() {
+//                    Node<E> cursor = store;
+//
+//                    @Override
+//                    public boolean checkDone() {
+//                        return cursor != null;
+//                    }
+//
+//                    @Override
+//                    public E currentElement() {
+//                        return cursor.first();
+//                    }
+//
+//                    @Override
+//                    public void nextElement() {
+//                        cursor = cursor.rest();
+//                    }
+//                }, () -> getModificationCount());
+//    }
     public Iterator<E> iterator() {
-        return new SinglyLinkedListIterator();
+        return new MutableCollectionIterator<>(new Cursor<E>() {
+            private Node<E> cursor = store;
+
+            @Override
+            public boolean isDone() {
+                return cursor == null;
+            }
+
+            @Override
+            public E current() {
+                return cursor.first();
+            }
+
+            @Override
+            public void advance() {
+                cursor = cursor.rest();
+            }
+        }, () -> getModificationCount());
     }
 
     @Override
@@ -74,13 +115,13 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected void doDoInsertBefore(Node<E> node, E obj) {
+    protected void doInsertBefore(Node<E> node, E obj) {
         node.spliceBefore(obj);
         count++;
     }
 
     @Override
-    protected void doDoInsertAfter(Node<E> node, E obj) {
+    protected void doInsertAfter(Node<E> node, E obj) {
         node.spliceAfter(obj);
         count++;
     }
@@ -103,7 +144,7 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected E doDoDeleteNode(Node<E> doomed) {
+    protected E doDeleteNode(Node<E> doomed) {
         if (doomed == store) {
             store = store.rest();
         } else {
@@ -115,7 +156,7 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected E doDoDeleteChild(Node<E> parent) {
+    protected E doDeleteChild(Node<E> parent) {
         count--;
         return parent.exciseChild();
     }
@@ -147,32 +188,32 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
     //    As an inner class, this provides access to `store`, but this
     //    arrangement precludes sharing with SinglyLinkedListX...
     //
-    private class SinglyLinkedListIterator extends MutableListIterator<E> {
-        private Node<E> cursor = store;
-
-        //    Shouldn't give access to enclosing list?!
-        //    Tension between inner class and code reuse!!
-        private SinglyLinkedListIterator() {
-            super(SinglyLinkedList.this);
-        }
-
-        @Override
-        protected boolean doIsDone() {
-            return cursor == null;
-        }
-
-        @Override
-        protected E doDoCurrent() {
-            return cursor.first();
-        }
-
-        @Override
-        protected void doNext() {
-            if ( !isDone() ) {
-                cursor = cursor.rest();
-            }
-        }
-    }
+//    private class SinglyLinkedListIterator extends MutableListIterator<E> {
+//        private Node<E> cursor = store;
+//
+//        //    Shouldn't give access to enclosing list?!
+//        //    Tension between inner class and code reuse!!
+//        private SinglyLinkedListIterator() {
+//            super(SinglyLinkedList.this);
+//        }
+//
+//        @Override
+//        protected boolean doIsDone() {
+//            return cursor == null;
+//        }
+//
+//        @Override
+//        protected E doDoCurrent() {
+//            return cursor.first();
+//        }
+//
+//        @Override
+//        protected void doNext() {
+//            if ( !isDone() ) {
+//                cursor = cursor.rest();
+//            }
+//        }
+//    }
 
     public static void main(String[] args) {
         List<Integer> sll = new SinglyLinkedList<>(0);

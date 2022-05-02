@@ -1,8 +1,6 @@
 package containers;
 
-public abstract class MutableLinkedList<E> extends LinkedList<E> {
-    private int modificationCount = 0;
-
+public abstract class MutableLinkedList<E> extends MutableList<E> {
     protected MutableLinkedList() {
         super();
     }
@@ -11,79 +9,49 @@ public abstract class MutableLinkedList<E> extends LinkedList<E> {
         super(fillElt);
     }
 
-    @Override
-    public final void clear() {
-        countModification();
-        doClear();
-    }
-
-    protected abstract void doClear();
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public final void add(E... objs) {
-        if ( objs.length > 0 ) {
+    public final void insertBefore(Node<E> node, E obj) {
+        if ( node == null ) {
+            throw new IllegalArgumentException("Invalid node");
+        } else {
+            doInsertBefore(node, obj);
             countModification();
-            doAdd(objs);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected abstract void doAdd(E... objs);
+    protected abstract void doInsertBefore(Node<E> node, E obj);
 
-    @Override
-    protected final void doInsert(int i, E obj) {
-        countModification();
-        doDoInsert(i, obj);
+    public final void insertAfter(Node<E> node, E obj) {
+        if ( node == null ) {
+            throw new IllegalArgumentException("Invalid node");
+        } else {
+            doInsertAfter(node, obj);
+            countModification();
+        }
     }
 
-    protected abstract void doDoInsert(int i, E obj);
+    protected abstract void doInsertAfter(Node<E> node, E obj);
 
-    @Override
-    protected final E doDelete(int i) {
-        countModification();
-        return doDoDelete(i);
+    public final E deleteNode(Node<E> node) {
+        if ( node == null ) {
+            throw new IllegalArgumentException("Invalid node");
+        } else {
+            E doomed = doDeleteNode(node);
+            countModification();
+
+            return doomed;
+        }
     }
 
-    protected abstract E doDoDelete(int i);
+    protected abstract E doDeleteNode(Node<E> doomed);
 
-    @Override
-    protected final void doInsertBefore(Node<E> node, E obj) {
-        countModification();
-        doDoInsertBefore(node, obj);
+    public final E deleteChild(Node<E> parent) {
+        if ( parent == null ) {
+            throw new IllegalArgumentException("Invalid node");
+        } else {
+            countModification();
+            return doDeleteChild(parent);
+        }
     }
 
-    protected abstract void doDoInsertBefore(Node<E> node, E obj);
-
-    @Override
-    protected final void doInsertAfter(Node<E> node, E obj) {
-        countModification();
-        doDoInsertAfter(node, obj);
-    }
-
-    protected abstract void doDoInsertAfter(Node<E> node, E obj);
-
-    @Override
-    protected final E doDeleteNode(Node<E> doomed) {
-        countModification();
-        return doDoDeleteNode(doomed);
-    }
-
-    protected abstract E doDoDeleteNode(Node<E> doomed);
-
-    @Override
-    protected final E doDeleteChild(Node<E> parent) {
-        countModification();
-        return doDoDeleteChild(parent);
-    }
-
-    protected abstract E doDoDeleteChild(Node<E> parent);
-
-    private void countModification() {
-        modificationCount++;
-    }
-
-    protected int getModificationCount() {
-        return modificationCount;
-    }
+    protected abstract E doDeleteChild(Node<E> parent);
 }

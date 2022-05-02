@@ -36,9 +36,30 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
+//    public Iterator<E> iterator() {
+//        return new SinglyLinkedListIterator();
+//    }
     public Iterator<E> iterator() {
-        return new SinglyLinkedListIterator();
+        return new MutableCollectionIterator<>(new Cursor<E>() {
+            private Node<E> cursor = front;
+
+            @Override
+            public boolean isDone() {
+                return cursor == null;
+            }
+
+            @Override
+            public E current() {
+                return cursor.first();
+            }
+
+            @Override
+            public void advance() {
+                cursor = cursor.rest();
+            }
+        }, () -> getModificationCount());
     }
+
 
     @Override
     public E contains(E object, BiPredicate<E, E> equalityTest) {
@@ -81,7 +102,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected void doDoInsertBefore(Node<E> node, E obj) {
+    protected void doInsertBefore(Node<E> node, E obj) {
         node.spliceBefore(obj);
 
         if ( node == rear ) {
@@ -92,7 +113,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected void doDoInsertAfter(Node<E> node, E obj) {
+    protected void doInsertAfter(Node<E> node, E obj) {
         node.spliceAfter(obj);
 
         if ( node == rear ) {
@@ -126,7 +147,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected E doDoDeleteNode(Node<E> doomed) {
+    protected E doDeleteNode(Node<E> doomed) {
         E result;
 
         if (doomed == front) {
@@ -149,7 +170,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected E doDoDeleteChild(Node<E> parent) {
+    protected E doDeleteChild(Node<E> parent) {
         E doomed = parent.exciseChild();
 
         if ( parent.rest() == null ) {
@@ -183,26 +204,26 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
         return list;
     }
 
-    private class SinglyLinkedListIterator extends Iterator<E> {
-        private Node<E> cursor = front;
-
-        @Override
-        public boolean isDone() {
-            return cursor == null;
-        }
-
-        @Override
-        protected E doCurrent() {
-            return cursor.first();
-        }
-
-        @Override
-        public void next() {
-            if ( !isDone() ) {
-                cursor = cursor.rest();
-            }
-        }
-    }
+//    private class SinglyLinkedListIterator extends Iterator<E> {
+//        private Node<E> cursor = front;
+//
+//        @Override
+//        public boolean isDone() {
+//            return cursor == null;
+//        }
+//
+//        @Override
+//        protected E doCurrent() {
+//            return cursor.first();
+//        }
+//
+//        @Override
+//        public void next() {
+//            if ( !isDone() ) {
+//                cursor = cursor.rest();
+//            }
+//        }
+//    }
 
     public static void main(String[] args) {
         List<Integer> sllx = new SinglyLinkedListX<>(0);

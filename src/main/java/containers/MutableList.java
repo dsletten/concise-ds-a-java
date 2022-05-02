@@ -51,7 +51,7 @@ public abstract class MutableList<E> extends List<E> {
 
     protected abstract E doDoDelete(int i);
 
-    private void countModification() {
+    protected void countModification() {
         modificationCount++;
     }
 
