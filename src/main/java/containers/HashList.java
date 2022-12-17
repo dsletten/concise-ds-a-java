@@ -2,10 +2,9 @@ package containers;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiPredicate;
 
 public class HashList<E> extends MutableList<E> {
-    private Map<Integer, E> store = new HashMap<>();
+    private final Map<Integer, E> store = new HashMap<>();
 
     public HashList() {
         super();
@@ -13,6 +12,11 @@ public class HashList<E> extends MutableList<E> {
 
     public HashList(E fillElt) {
         super(fillElt);
+    }
+
+    @Override
+    protected List<E> makeEmptyList() {
+        return new HashList<>(getFillElt());
     }
 
     @Override
@@ -34,43 +38,54 @@ public class HashList<E> extends MutableList<E> {
 //    public Iterator<E> iterator() {
 //        return new RandomAccessListIterator();
 //    }
+//    public Iterator<E> iterator() {
+//        return new MutableCollectionIterator<>(new Cursor<E>() {
+//            private int cursor = 0;
+//
+//            @Override
+//            public boolean isDone() {
+//                return cursor == size();
+//            }
+//
+//            @Override
+//            public E current() {
+//                return get(cursor);
+//            }
+//
+//            @Override
+//            public void advance() {
+//                cursor++;
+//            }
+//        }, () -> getModificationCount());
+//    }
     public Iterator<E> iterator() {
-        return new MutableCollectionIterator<>(new Cursor<E>() {
-            private int cursor = 0;
-
-            @Override
-            public boolean isDone() {
-                return cursor == size();
-            }
-
-            @Override
-            public E current() {
-                return get(cursor);
-            }
-
-            @Override
-            public void advance() {
-                cursor++;
-            }
-        }, () -> getModificationCount());
+        return new MutableCollectionIterator<>(CursorFactory.makeRandomAccessListCursor(this),
+                () -> modificationCount);
     }
 
-    @Override
-    public E contains(E object, BiPredicate<E, E> test) {
-        for (E elt : store.values()) {
-            if ( test.test(object, elt) ) {
-                return elt;
-            }
-        }
-
-        return null;
+    public ListIterator<E> listIterator(int start) {
+        return new RandomAccessListListIterator<>(this, start, new RemoteControl().addCommand("modificationCount", () -> modificationCount));
     }
 
+//    @Override
+//    public E contains(E object, BiPredicate<E, E> test) {
+//        for (E elt : store.values()) {
+//            if ( test.test(object, elt) ) {
+//                return elt;
+//            }
+//        }
+//
+//        return null;
+//    }
+
+    @SuppressWarnings("unchecked")
     @Override
-    protected void doAdd(E... objs) {
+    protected HashList<E> doDoAdd(E... objs) {
         for (E obj : objs) {
             store.put(store.size(), obj);
         }
+
+        return this;
     }
 
     @Override
@@ -105,16 +120,16 @@ public class HashList<E> extends MutableList<E> {
         store.replace(i, obj);
     }
 
-    @Override
-    public int index(E obj, BiPredicate<E, E> test) {
-        for (int i = 0; i < size(); i++) {
-            if ( test.test(obj, store.get(i)) ) {
-                return i;
-            }
-        }
-
-        return NOT_PRESENT;
-    }
+//    @Override
+//    public int index(E obj, BiPredicate<E, E> test) {
+//        for (int i = 0; i < size(); i++) {
+//            if ( test.test(obj, store.get(i)) ) {
+//                return i;
+//            }
+//        }
+//
+//        return NOT_PRESENT;
+//    }
 
     @Override
     protected List<E> doSlice(int i, int n) {
@@ -126,6 +141,7 @@ public class HashList<E> extends MutableList<E> {
         for (int j = 0, k = start; j < slice.length; j++, k++) {
             slice[j] = get(k);
         }
+        //noinspection unchecked
         list.add((E[]) slice);
 
         return list;

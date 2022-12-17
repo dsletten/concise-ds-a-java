@@ -25,13 +25,18 @@ public class TestLinkedStack {
     }
 
     @Test
-    public void testPop() {
-        TestStack.testPop(LinkedStack::new);
+    public void testToArray() {
+        TestStack.testToArray(LinkedStack::new);
     }
 
     @Test
-    public void testPeek() {
-        TestStack.testPeek(LinkedStack::new);
+    public void testPush() {
+        TestStack.testPush(LinkedStack::new);
+    }
+
+    @Test
+    public void testPeekPop() {
+        TestStack.testPeekPop(LinkedStack::new);
     }
 
     @Test

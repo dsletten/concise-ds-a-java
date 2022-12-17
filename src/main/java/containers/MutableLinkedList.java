@@ -9,7 +9,7 @@ public abstract class MutableLinkedList<E> extends MutableList<E> {
         super(fillElt);
     }
 
-    public final void insertBefore(Node<E> node, E obj) {
+    public final void insertBefore(LinkedNode<E> node, E obj) {
         if ( node == null ) {
             throw new IllegalArgumentException("Invalid node");
         } else {
@@ -18,9 +18,9 @@ public abstract class MutableLinkedList<E> extends MutableList<E> {
         }
     }
 
-    protected abstract void doInsertBefore(Node<E> node, E obj);
+    protected abstract void doInsertBefore(LinkedNode<E> node, E obj);
 
-    public final void insertAfter(Node<E> node, E obj) {
+    public final void insertAfter(LinkedNode<E> node, E obj) {
         if ( node == null ) {
             throw new IllegalArgumentException("Invalid node");
         } else {
@@ -29,9 +29,9 @@ public abstract class MutableLinkedList<E> extends MutableList<E> {
         }
     }
 
-    protected abstract void doInsertAfter(Node<E> node, E obj);
+    protected abstract void doInsertAfter(LinkedNode<E> node, E obj);
 
-    public final E deleteNode(Node<E> node) {
+    public final E deleteNode(LinkedNode<E> node) {
         if ( node == null ) {
             throw new IllegalArgumentException("Invalid node");
         } else {
@@ -42,9 +42,9 @@ public abstract class MutableLinkedList<E> extends MutableList<E> {
         }
     }
 
-    protected abstract E doDeleteNode(Node<E> doomed);
+    protected abstract E doDeleteNode(LinkedNode<E> doomed);
 
-    public final E deleteChild(Node<E> parent) {
+    public final E deleteChild(LinkedNode<E> parent) {
         if ( parent == null ) {
             throw new IllegalArgumentException("Invalid node");
         } else {
@@ -53,5 +53,5 @@ public abstract class MutableLinkedList<E> extends MutableList<E> {
         }
     }
 
-    protected abstract E doDeleteChild(Node<E> parent);
+    protected abstract E doDeleteChild(LinkedNode<E> parent);
 }

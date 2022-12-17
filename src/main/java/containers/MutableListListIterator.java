@@ -3,9 +3,9 @@ package containers;
 public abstract class MutableListListIterator<E> extends ListIterator<E> {
     private int expectedModificationCount;
 
-    public MutableListListIterator(MutableList<E> list) {
-        super(list);
-        expectedModificationCount = list.getModificationCount();
+    protected MutableListListIterator(MutableList<E> list, RemoteControl rc) {
+        super(list, rc);
+        expectedModificationCount = (Integer) rc.press("modificationCount");
     }
 
     private void countModification() {
@@ -13,7 +13,7 @@ public abstract class MutableListListIterator<E> extends ListIterator<E> {
     }
 
     private boolean comodified() {
-        return expectedModificationCount != ((MutableList<E>) list).getModificationCount();
+        return expectedModificationCount != (Integer) rc.press("modificationCount");
     }
 
     @Override

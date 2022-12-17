@@ -24,13 +24,18 @@ public class TestLinkedListQueue {
     }
 
     @Test
-    public void testDequeue() {
-        TestQueue.testDequeue(LinkedListQueue::new);
+    public void testToArray() {
+        TestQueue.testToArray(LinkedListQueue::new);
     }
 
     @Test
-    public void testFront() {
-        TestQueue.testFront(LinkedListQueue::new);
+    public void testEnqueue() {
+        TestQueue.testEnqueue(LinkedListQueue::new);
+    }
+
+    @Test
+    public void testFrontDequeue() {
+        TestQueue.testFrontDequeue(LinkedListQueue::new);
     }
 
     @Test

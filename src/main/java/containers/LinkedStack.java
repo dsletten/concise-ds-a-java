@@ -28,7 +28,6 @@ public class LinkedStack<E> extends Stack<E> {
 
     @Override
     protected E doPop() {
-//        E discard = top.first();
         E discard = peek();
         top = top.rest();
         count--;

@@ -1,16 +1,21 @@
 package containers;
 
-import java.util.function.BiPredicate;
-
 public class DoublyLinkedList<E> extends MutableLinkedList<E> {
     protected Dcons<E> store = null;
     private int count = 0;
-    private Dcursor cursor = new Dcursor();
+    private final Dcursor cursor = new Dcursor();
+    //    Alternative Dcursor with RemoteControl
+//    private Dcursor cursor = setupCursor();
 
     public DoublyLinkedList() {}
 
     public DoublyLinkedList(E fillElt) {
         super(fillElt);
+    }
+
+    @Override
+    protected List<E> makeEmptyList() {
+        return new DoublyLinkedList<>(getFillElt());
     }
 
     @Override
@@ -43,31 +48,64 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
 //    public Iterator<E> iterator() {
 //        return new DoublyLinkedListIterator();
 //    }
+//    public Iterator<E> iterator() {
+//        return new MutableCollectionIterator<>(new Cursor<E>() {
+//            private Dcons<E> node = store;
+//            private boolean sealedForYourProtection = true;
+//
+//            @Override
+//            public boolean isDone() {
+//                return isEmpty() || (!sealedForYourProtection && node == store);
+//            }
+//
+//            @Override
+//            public E current() {
+//                return node.getContent();
+//            }
+//
+//            @Override
+//            public void advance() {
+//                if (!isDone()) {
+//                    node = node.getNext();
+//                    sealedForYourProtection = false;
+//                }
+//            }
+//        }, () -> getModificationCount());
+//    }
     public Iterator<E> iterator() {
-        return new MutableCollectionIterator<>(new Cursor<E>() {
-            private Dcons<E> node = store;
+        return new MutableCollectionIterator<>(new Cursor<>() {
+            private final Dcursor dcursor = new Dcursor();
+            //            private Dcursor dcursor = setupCursor();
             private boolean sealedForYourProtection = true;
 
             @Override
             public boolean isDone() {
-                return isEmpty() || (!sealedForYourProtection && node == store);
+                return isEmpty() || (!sealedForYourProtection && dcursor.atStart());
             }
 
             @Override
             public E current() {
-                return node.getContent();
+                return dcursor.node.getContent();
             }
 
             @Override
             public void advance() {
                 if (!isDone()) {
-                    node = node.getNext();
+                    dcursor.advance();
                     sealedForYourProtection = false;
                 }
             }
-        }, () -> getModificationCount());
+        }, () -> modificationCount);
     }
 
+    public ListIterator<E> listIterator(int start) {
+        return new RandomAccessListListIterator<>(this, start, new RemoteControl().addCommand("modificationCount", () -> modificationCount));
+    }
+
+    //    Alternative Dcursor
+//    private Dcursor setupCursor() {
+//        return new Dcursor(new RemoteControl().addCommand("headNode", () -> store).addCommand("size", () -> count));
+//    }
     /*
      *    This is reasonable due to the cursors.
      */
@@ -82,23 +120,23 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
 //        return false;
 //    }
 
-    @Override
-    public E contains(E object, BiPredicate<E, E> equalityTest) {
-        Dcons<E> dcons = store;
-        for (int i = 0; i < count; i++) {
-            if ( equalityTest.test(object, dcons.getContent()) ) {
-                return dcons.getContent();
-            }
-
-            dcons = dcons.getNext();
-        }
-
-        return null;
-    }
+//    @Override
+//    public E contains(E object, BiPredicate<E, E> equalityTest) {
+//        Dcons<E> dcons = store;
+//        for (int i = 0; i < count; i++) {
+//            if ( equalityTest.test(object, dcons.getContent()) ) {
+//                return dcons.getContent();
+//            }
+//
+//            dcons = dcons.getNext();
+//        }
+//
+//        return null;
+//    }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void doAdd(E... objs) {
+    public DoublyLinkedList<E> doDoAdd(E... objs) {
         Dcons<E> dcons = new Dcons<>(objs[0]);
 
         if (isEmpty()) {
@@ -112,6 +150,8 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
         if (!cursor.isInitialized()) {
             cursor.reset();
         }
+
+        return this;
     }
 
     private void addNodes(Dcons<E> start, E[] elts) {
@@ -214,6 +254,7 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
         }
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static boolean isBetweenInclusive(int i, int low, int high) {
         return low <= i && i <= high;
     }
@@ -269,23 +310,46 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected void doInsertBefore(Node<E> node, E obj) {
+    protected void doInsertBefore(LinkedNode<E> node, E obj) {
+        node.spliceBefore(obj);
 
+        if ( node == store ) {
+            store = store.previous;
+        }
+
+        count++;
+        cursor.reset();
     }
 
     @Override
-    protected void doInsertAfter(Node<E> node, E obj) {
-
+    protected void doInsertAfter(LinkedNode<E> node, E obj) {
+        node.spliceAfter(obj);
+        count++;
+        cursor.reset();
     }
 
     @Override
-    protected E doDeleteNode(Node<E> doomed) {
-        return null;
+    protected E doDeleteNode(LinkedNode<E> node) {
+        E doomed = deleteDcons((Dcons<E>) node);
+        count--;
+        cursor.reset();
+
+        return doomed;
     }
 
     @Override
-    protected E doDeleteChild(Node<E> parent) {
-        return null;
+    protected E doDeleteChild(LinkedNode<E> parent) {
+        Dcons<E> child = ((Dcons<E>) parent).getNext();
+
+        if ( child == store ) {
+            throw new IllegalStateException("Parent must have child node");
+        } else {
+            E doomed = parent.exciseChild();
+            count--;
+            cursor.reset();
+
+            return doomed;
+        }
     }
 
     @Override
@@ -301,17 +365,17 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
     /*
      *    This is reasonable due to the cursors.
      */
-    @Override
-    public int index(E obj, BiPredicate<E, E> test) {
-        for (int i = 0; i < count; i++) {
-//            if ( get(i).equals(obj) ) {
-            if ( test.test(obj, get(i)) ) {
-                return i;
-            }
-        }
-
-        return NOT_PRESENT;
-    }
+//    @Override
+//    public int index(E obj, BiPredicate<E, E> test) {
+//        for (int i = 0; i < count; i++) {
+////            if ( get(i).equals(obj) ) {
+//            if ( test.test(obj, get(i)) ) {
+//                return i;
+//            }
+//        }
+//
+//        return NOT_PRESENT;
+//    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -333,7 +397,6 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
 //        return result;
 //    }
 
-    @SuppressWarnings("unchecked")
     protected Object[] subseq(int start, int end) {
         Object[] slice = new Object[end - start];
 
@@ -350,11 +413,12 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
             }
         }
 
-        return (E[]) slice;
+        return slice;
     }
 
-    private static class Dcons<E> {
-        private E content = null;
+//    private static class Dcons<E> {
+    protected static class Dcons<E> implements LinkedNode<E> {
+        private E content;
         private Dcons<E> previous = null;
         private Dcons<E> next = null;
 
@@ -362,27 +426,27 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
             this.content = content;
         }
 
-        public E getContent() {
+        protected E getContent() {
             return content;
         }
 
-        private void setContent(E content) {
+        protected void setContent(E content) {
             this.content = content;
         }
 
-        public Dcons<E> getPrevious() {
+        protected Dcons<E> getPrevious() {
             return previous;
         }
 
-        private void setPrevious(Dcons<E> previous) {
+        protected void setPrevious(Dcons<E> previous) {
             this.previous = previous;
         }
 
-        public Dcons<E> getNext() {
+        protected Dcons<E> getNext() {
             return next;
         }
 
-        private void setNext(Dcons<E> next) {
+        protected void setNext(Dcons<E> next) {
             this.next = next;
         }
 
@@ -391,19 +455,22 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
             next.setPrevious(this);
         }
 
-        private void spliceBefore(E obj) {
+//        private void spliceBefore(E obj) {
+        public void spliceBefore(E obj) {
             Dcons<E> newDcons = new Dcons<>(obj);
             getPrevious().link(newDcons);
             newDcons.link(this);
         }
 
-        private void spliceAfter(E obj) {
+//        private void spliceAfter(E obj) {
+        public void spliceAfter(E obj) {
             Dcons<E> newDcons = new Dcons<>(obj);
             newDcons.link(getNext());
             link(newDcons);
         }
 
-        private E exciseNode() {
+//        private E exciseNode() {
+        public E exciseNode() {
             if ( this == getNext() ) {
                 throw new IllegalStateException("Cannot delete sole node.");
             } else {
@@ -413,7 +480,8 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
             return getContent();
         }
 
-        private E exciseChild() {
+//        private E exciseChild() {
+        public E exciseChild() {
             Dcons<E> child = getNext();
 
             if ( this == child ) {
@@ -459,17 +527,15 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
     //
     //    Inner class. Can refer to its associated List.
     //
-    private class Dcursor {
-//        private class Dcursor<E> {
-        private Dcons<E> node = null;
+    class Dcursor {
+        private Dcons<E> node;
         private int index = 0;
 
-//        protected Dcursor(DoublyLinkedList<E> list) {
-//            this.list = list;
         protected Dcursor() {
-//            node = store;
+            node = store;
         }
 
+        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         protected boolean isInitialized() {
             return node != null;
         }
@@ -545,14 +611,135 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
             node = node.getNext();
         }
 
-//        protected int getIndex() {
-//            return index;
+        protected void nudge() {
+            if ( !isInitialized() ) {
+                reset();
+            }
+            doNudge();
+        }
+
+        protected void doNudge() {
+            index++;
+        }
+
+// ??????????????????
+        protected int getIndex() {
+            return index;
+        }
+
+        protected Dcons<E> getNode() {
+            return node;
+        }
+    }
+
+//    //
+//    //    Don't need to jump through all of the hoops with Java due to inner class above.
+//    //    But this class could be externalized.
+//    //
+//    private class Dcursor {
+//        private Dcons<E> node;
+//        private int index = 0;
+//        private RemoteControl remoteControl;
+//
+//        protected Dcursor(RemoteControl remoteControl) {
+//            this.remoteControl = remoteControl;
+//            node = (Dcons<E>) remoteControl.press("headNode");
 //        }
 //
-//        protected Dcons<E> getNode() {
-//            return node;
+//        protected boolean isInitialized() {
+//            return node != null;
 //        }
-    }
+//
+//        protected boolean atStart() {
+//            return !isInitialized()  ||  index == 0;
+//        }
+//
+//        protected boolean atEnd() {
+//            return !isInitialized()  ||  index == (Integer) remoteControl.press("size") - 1;
+//        }
+//
+//        protected void reset() {
+//            node = (Dcons<E>) remoteControl.press("headNode");
+//            index = 0;
+//        }
+//
+//        protected void advance() {
+//            advance(1);
+//        }
+//
+//        // Broken??? Possibly still not initialized? ????????????????
+//        protected void advance(int step) {
+//            if ( !isInitialized() ) {
+//                reset();
+////                throw new IllegalStateException("Cursor has not been initialized.");
+//            } //else {
+//
+//            doAdvance(step);
+//        }
+//
+//        protected void doAdvance(int step) {
+//            for (int i = 0; i < step; i++) {
+//                index++;
+//                node = node.getNext();
+//            }
+//
+//            index %= (Integer) remoteControl.press("size");
+//        }
+//
+//        protected void rewind() {
+//            rewind(1);
+//        }
+//
+//        // Broken??? Possibly still not initialized? ????????????????
+//        protected void rewind(int step) {
+//            if ( !isInitialized() ) {
+//                reset();
+////                throw new IllegalStateException("Cursor has not been initialized.");
+//            } //else {
+//            doRewind(step);
+//        }
+//
+//        protected void doRewind(int step) {
+//            for (int i = 0; i < step; i++) {
+//                index--;
+//                node = node.getPrevious();
+//            }
+//
+//            index %= (Integer) remoteControl.press("size");
+//        }
+//
+//        // Broken??? Possibly still not initialized? ????????????????
+//        protected void bump() {
+//            if ( !isInitialized() ) {
+//                reset();
+////                throw new IllegalStateException("Cursor has not been initialized.");
+//            } //else {
+//            doBump();
+//        }
+//
+//        protected void doBump() {
+//            node = node.getNext();
+//        }
+//
+//        protected void nudge() {
+//            if ( !isInitialized() ) {
+//                reset();
+//            }
+//            doNudge();
+//        }
+//
+//        protected void doNudge() {
+//            index++;
+//        }
+//
+////        protected int getIndex() {
+////            return index;
+////        }
+////
+////        protected Dcons<E> getNode() {
+////            return node;
+////        }
+//    }
 
 //    private class DoublyLinkedListIterator extends Iterator<E> {
 //        private Dcons<E> node = store;
@@ -576,16 +763,6 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
 //            }
 //        }
 //    }
-
-    private static int mod(int number, int divisor) {
-        int rem = number % divisor;
-
-        if ( rem != 0  && (divisor < 0 ? number > 0 : number < 0) ) {
-            return rem + divisor;
-        } else {
-            return rem;
-        }
-    }
 
 
     public static void main(String[] args) {
@@ -658,5 +835,19 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
         System.out.println(d1);
 
         System.out.println(dll.store);
+
+        ListIterator<Integer> li = dll.listIterator();
+        System.out.println(li.current());
+        System.out.println(li.currentIndex());
+        li.next();
+        System.out.println(li.current());
+        li.addBefore(-99);
+        li.addAfter(-98);
+        System.out.println(dll);
+
+        li = dll.listIterator(dll.size()-1);
+        System.out.println(li.current());
+        li.previous();
+        System.out.println(li.current());
     }
 }

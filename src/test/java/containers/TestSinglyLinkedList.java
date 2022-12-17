@@ -29,13 +29,33 @@ public class TestSinglyLinkedList {
     }
 
     @Test
+    public void testContainsPredicate() {
+        TestList.testContainsPredicate(SinglyLinkedList::new);
+    }
+
+    @Test
+    public void testEquals() {
+        TestList.testEquals(SinglyLinkedList::new);
+    }
+
+    @Test
+    public void testEqualsPredicate() {
+        TestList.testEqualsPredicate(SinglyLinkedList::new);
+    }
+
+    @Test
     public void testEach() {
-        TestList.testEach(SinglyLinkedList<Character>::new);
+        TestList.testEach(SinglyLinkedList::new);
+    }
+
+    @Test
+    public void testAdd() {
+        TestList.testAdd(SinglyLinkedList::new);
     }
 
     @Test
     public void testInsertFillNull() {
-        TestList.testInsertFillNull(SinglyLinkedList<String>::new);
+        TestList.testInsertFillNull(SinglyLinkedList::new);
     }
 
     @Test
@@ -45,66 +65,66 @@ public class TestSinglyLinkedList {
 
     @Test
     public void testInsertNegativeIndex() {
-        TestList.testInsertNegativeIndex(SinglyLinkedList<Integer>::new);
+        TestList.testInsertNegativeIndex(SinglyLinkedList::new);
     }
 
     @Test
     public void testInsertEnd() {
-        TestList.testInsertEnd(SinglyLinkedList<Integer>::new);
+        TestList.testInsertEnd(SinglyLinkedList::new);
     }
 
     @Test
     public void testDelete() {
-        TestList.testDelete(SinglyLinkedList<Integer>::new);
+        TestList.testDelete(SinglyLinkedList::new);
     }
 
     @Test
     public void testDeleteNegativeIndex() {
-        TestList.testDeleteNegativeIndex(SinglyLinkedList<Integer>::new);
+        TestList.testDeleteNegativeIndex(SinglyLinkedList::new);
     }
 
     @Test
     public void testGet() {
-        TestList.testGet(SinglyLinkedList<Integer>::new);
+        TestList.testGet(SinglyLinkedList::new);
     }
 
     @Test
     public void testGetNegativeIndex() {
-        TestList.testGetNegativeIndex(SinglyLinkedList<Integer>::new);
+        TestList.testGetNegativeIndex(SinglyLinkedList::new);
     }
 
     @Test
     public void testSet() {
-        TestList.testSet(SinglyLinkedList<Integer>::new);
+        TestList.testSet(SinglyLinkedList::new);
     }
 
     @Test
     public void testSetNegativeIndex() {
-        TestList.testSetNegativeIndex(SinglyLinkedList<Integer>::new);
+        TestList.testSetNegativeIndex(SinglyLinkedList::new);
     }
 
     @Test
     public void testSetOutOfBounds() {
-        TestList.testSetOutOfBounds(SinglyLinkedList<String>::new);
+        TestList.testSetOutOfBounds(SinglyLinkedList::new);
     }
 
     @Test
     public void testIndex() {
-        TestList.testIndex(SinglyLinkedList<Integer>::new);
+        TestList.testIndex(SinglyLinkedList::new);
     }
 
     @Test
     public void testSlice() {
-        TestList.testSlice(SinglyLinkedList<Integer>::new);
+        TestList.testSlice(SinglyLinkedList::new);
     }
 
     @Test
     public void testSliceCornerCases() {
-        TestList.testSliceCornerCases(SinglyLinkedList<Integer>::new);
+        TestList.testSliceCornerCases(SinglyLinkedList::new);
     }
 
     @Test
     public void testTime() {
-        TestList.testTime(SinglyLinkedList<Integer>::new);
+        TestList.testTime(SinglyLinkedList::new);
     }
 }

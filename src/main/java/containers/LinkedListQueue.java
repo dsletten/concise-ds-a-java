@@ -1,16 +1,11 @@
 package containers;
 
 public class LinkedListQueue<E> extends Queue<E> {
-    private List<E> list = new SinglyLinkedListX<>();
+    private final List<E> list = new SinglyLinkedListX<>();
 
     @Override
     public int size() {
         return list.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return list.isEmpty();
     }
 
     @Override
@@ -20,6 +15,7 @@ public class LinkedListQueue<E> extends Queue<E> {
 
     @Override
     public void enqueue(E elt) {
+        //noinspection unchecked
         list.add(elt);
     }
 

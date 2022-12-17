@@ -1,7 +1,5 @@
 package containers;
 
-import java.util.function.BiPredicate;
-
 /*
  * Variant of SinglyLinkedList which holds a reference to last node of list for efficiency.
  */
@@ -16,6 +14,11 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
 
     public SinglyLinkedListX(E fillElt) {
         super(fillElt);
+    }
+
+    @Override
+    protected List<E> makeEmptyList() {
+        return new SinglyLinkedListX<>(getFillElt());
     }
 
     @Override
@@ -39,38 +42,46 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
 //    public Iterator<E> iterator() {
 //        return new SinglyLinkedListIterator();
 //    }
+//    public Iterator<E> iterator() {
+//        return new MutableCollectionIterator<>(new Cursor<E>() {
+//            private Node<E> cursor = front;
+//
+//            @Override
+//            public boolean isDone() {
+//                return cursor == null;
+//            }
+//
+//            @Override
+//            public E current() {
+//                return cursor.first();
+//            }
+//
+//            @Override
+//            public void advance() {
+//                cursor = cursor.rest();
+//            }
+//        }, () -> getModificationCount());
+//    }
     public Iterator<E> iterator() {
-        return new MutableCollectionIterator<>(new Cursor<E>() {
-            private Node<E> cursor = front;
-
-            @Override
-            public boolean isDone() {
-                return cursor == null;
-            }
-
-            @Override
-            public E current() {
-                return cursor.first();
-            }
-
-            @Override
-            public void advance() {
-                cursor = cursor.rest();
-            }
-        }, () -> getModificationCount());
+        return new MutableCollectionIterator<>(CursorFactory.makeSinglyLinkedListCursor(front),
+                () -> modificationCount);
     }
 
-
-    @Override
-    public E contains(E object, BiPredicate<E, E> equalityTest) {
-        return Node.contains(front, object, equalityTest);
+    public ListIterator<E> listIterator(int start) {
+        return new SinglyLinkedListListIterator<>(this, start,
+                new RemoteControl().addCommand("modificationCount", () -> modificationCount).addCommand("headNode", () -> front));
     }
+
+//    @Override
+//    public E contains(E object, BiPredicate<E, E> equalityTest) {
+//        return Node.contains(front, object, equalityTest);
+//    }
 
     @Override
 //    @SafeVarargs // ????
 //    public final void add(E... objs) {
     @SuppressWarnings("unchecked")
-    public void doAdd(E... objs) {
+    public SinglyLinkedListX<E> doDoAdd(E... objs) {
         if ( isEmpty() ) {
             rear = front = new Node<>(objs[0], null);
             addNodes(objs, 1);
@@ -79,6 +90,8 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
         }
 
         count += objs.length;
+
+        return this;
     }
 
     private void addNodes(E[] objs, int start) {
@@ -92,6 +105,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     @Override
     public void doDoInsert(int i, E obj) {
         Node<E> node = Node.nthCdr(front, i);
+        assert node != null;
         node.spliceBefore(obj);
 
         if ( node == rear ) {
@@ -102,7 +116,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected void doInsertBefore(Node<E> node, E obj) {
+    protected void doInsertBefore(LinkedNode<E> node, E obj) {
         node.spliceBefore(obj);
 
         if ( node == rear ) {
@@ -113,7 +127,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected void doInsertAfter(Node<E> node, E obj) {
+    protected void doInsertAfter(LinkedNode<E> node, E obj) {
         node.spliceAfter(obj);
 
         if ( node == rear ) {
@@ -135,6 +149,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
             }
         } else {
             Node<E> parent = Node.nthCdr(front, i - 1);
+            assert parent != null;
             doomed = parent.exciseChild();
 
             if ( parent.rest() == null ) {
@@ -147,7 +162,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected E doDeleteNode(Node<E> doomed) {
+    protected E doDeleteNode(LinkedNode<E> doomed) {
         E result;
 
         if (doomed == front) {
@@ -160,8 +175,8 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
         } else {
             result = doomed.exciseNode();
 
-            if ( doomed.rest() == null ) {
-                rear = doomed;
+            if ( ((Node<E>) doomed).rest() == null ) {
+                rear = (Node<E>) doomed;
             }
         }
 
@@ -170,11 +185,11 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected E doDeleteChild(Node<E> parent) {
+    protected E doDeleteChild(LinkedNode<E> parent) {
         E doomed = parent.exciseChild();
 
-        if ( parent.rest() == null ) {
-            rear = parent;
+        if ( ((Node<E>) parent).rest() == null ) {
+            rear = (Node<E>) parent;
         }
 
         count--;
@@ -191,10 +206,10 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
         Node.setNth(front, i, obj);
     }
 
-    @Override
-    public int index(E obj, BiPredicate<E, E> test) {
-        return Node.index(front, obj, test);
-    }
+//    @Override
+//    public int index(E obj, BiPredicate<E, E> test) {
+//        return Node.index(front, obj, test);
+//    }
 
     @Override
     protected List<E> doSlice(int i, int n) {
@@ -258,6 +273,20 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
         System.out.println(sllx.slice(-3, 5));
         System.out.println(sllx.slice(-20, 3));
 
-        sllx.each(integer -> System.out.println(integer));
+        sllx.each(System.out::println);
+
+        ListIterator<Integer> li = sllx.listIterator();
+        System.out.println(li.current());
+        System.out.println(li.currentIndex());
+        li.next();
+        System.out.println(li.current());
+        li.addBefore(-99);
+        li.addAfter(-98);
+        System.out.println(sllx);
+
+        li = sllx.listIterator(sllx.size()-1);
+        System.out.println(li.current());
+        li.previous();
+        System.out.println(li.current());
     }
 }

@@ -24,13 +24,18 @@ public class TestCircularQueue {
     }
 
     @Test
-    public void testDequeue() {
-        TestQueue.testDequeue(CircularQueue::new);
+    public void testToArray() {
+        TestQueue.testToArray(CircularQueue::new);
     }
 
     @Test
-    public void testFront() {
-        TestQueue.testFront(CircularQueue::new);
+    public void testEnqueue() {
+        TestQueue.testEnqueue(CircularQueue::new);
+    }
+
+    @Test
+    public void testFrontDequeue() {
+        TestQueue.testFrontDequeue(CircularQueue::new);
     }
 
     @Test

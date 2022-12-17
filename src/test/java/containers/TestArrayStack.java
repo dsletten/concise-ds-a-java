@@ -1,12 +1,20 @@
 package containers;
 
 import org.junit.jupiter.api.Test;
-
+//import org.openjdk.jmh.annotations.Benchmark;
+//import org.openjdk.jmh.annotations.Scope;
+//import org.openjdk.jmh.annotations.State;
+//import org.openjdk.jmh.infra.Blackhole;
 public class TestArrayStack {
     @Test
     public void testConstructor() {
         TestStack.testConstructor(ArrayStack::new);
     }
+
+//    @Benchmark
+//    public void measureName(Blackhole bh) {
+//
+//    }
 
     @Test
     public void testIsEmpty() {
@@ -24,13 +32,18 @@ public class TestArrayStack {
     }
 
     @Test
-    public void testPop() {
-        TestStack.testPop(ArrayStack::new);
+    public void testToArray() {
+        TestStack.testToArray(ArrayStack::new);
     }
 
     @Test
-    public void testPeek() {
-        TestStack.testPeek(ArrayStack::new);
+    public void testPush() {
+        TestStack.testPush(ArrayStack::new);
+    }
+
+    @Test
+    public void testPeekPop() {
+        TestStack.testPeekPop(ArrayStack::new);
     }
 
     @Test

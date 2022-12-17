@@ -2,8 +2,6 @@ package containers;
 
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class TestHashStack {
     @Test
     public void testConstructor() {
@@ -26,13 +24,18 @@ public class TestHashStack {
     }
 
     @Test
-    public void testPop() {
-        TestStack.testPop(HashStack::new);
+    public void testToArray() {
+        TestStack.testToArray(HashStack::new);
     }
 
     @Test
-    public void testPeek() {
-        TestStack.testPeek(HashStack::new);
+    public void testPush() {
+        TestStack.testPush(HashStack::new);
+    }
+
+    @Test
+    public void testPeekPop() {
+        TestStack.testPeekPop(HashStack::new);
     }
 
     @Test

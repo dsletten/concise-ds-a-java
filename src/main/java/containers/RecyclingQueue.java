@@ -1,7 +1,7 @@
 package containers;
 
 /*
- *    This class is kind of pointless. It is a trivial (and less efficient) variant of RingBuffer.
+ *    This class is kind of pointless. It is a trivial (and less efficient) variant of LinkedRingBuffer.
  */
 public class RecyclingQueue<E> extends LinkedQueue<E> {
     private static final int CAPACITY = 20;
@@ -20,22 +20,29 @@ public class RecyclingQueue<E> extends LinkedQueue<E> {
         }
     }
 
-    @Override
-    public void enqueue(E elt) {
-        rear.setFirst(elt);
-
+    private void resize() {
         if ( rear == ass ) {
             Node<E> more = Node.makeList(count + 1);
             ass.setRest(more);
             ass = more.last();
+        } else {
+            throw new IllegalStateException("resize() called without full store."); // Test?
+        }
+    }
+
+    @Override
+    public void enqueue(E elt) {
+        if ( rear == ass ) {
+            resize();
         }
 
+        rear.setFirst(elt);
         rear = rear.rest();
         count++;
     }
 
     @Override
-    protected E doDequeue() { // 3 extra assignments compared to RingBuffer!
+    protected E doDequeue() { // 3 extra assignments compared to LinkedRingBuffer!
         E discard = front();
 
         ass.setRest(front);  // X
@@ -62,6 +69,7 @@ public class RecyclingQueue<E> extends LinkedQueue<E> {
             queue.dequeue();
         }
 
+        //noinspection CastCanBeRemovedNarrowingVariableType
         Node<Integer> node = ((RecyclingQueue<Integer>) queue).front;
         while ( node != null ) {
             if ( node.first() != null ) {

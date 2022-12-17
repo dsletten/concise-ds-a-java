@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HashQueue<E> extends Queue<E> {
-    private Map<Integer, E> store = new HashMap<>();
+    private final Map<Integer, E> store = new HashMap<>();
     private int front = 0;
     private int rear = 0;
 
@@ -13,10 +13,10 @@ public class HashQueue<E> extends Queue<E> {
         return store.size();
     }
 
-    @Override
-    public boolean isEmpty() {
-        return store.isEmpty();
-    }
+//    @Override
+//    public boolean isEmpty() {
+//        return store.isEmpty();
+//    }
 
     @Override
     public void clear() {

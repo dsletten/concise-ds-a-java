@@ -23,7 +23,7 @@ public class PersistentLinkedStack<E> extends PersistentStack<E> {
     }
 
     @Override
-    public PersistentStack<E> clear() {
+    protected PersistentStack<E> makeEmptyPersistentStack() {
         return new PersistentLinkedStack<>();
     }
 

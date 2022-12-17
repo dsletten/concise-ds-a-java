@@ -2,9 +2,11 @@ package containers;
 
 public abstract class ListIterator<E> {
     protected List<E> list;
+    protected RemoteControl rc;
 
-    public ListIterator(List<E> list) {
+    protected ListIterator(List<E> list, RemoteControl rc) {
         this.list = list;
+        this.rc = rc;
     }
 
     public boolean isEmpty() {
@@ -55,6 +57,7 @@ public abstract class ListIterator<E> {
 
     protected abstract E doNext();
 
+    @SuppressWarnings("UnusedReturnValue")
     public final E previous() {
         if ( isEmpty() ) {
             throw new IllegalStateException("List is empty.");
@@ -65,6 +68,7 @@ public abstract class ListIterator<E> {
 
     protected abstract E doPrevious();
 
+    @SuppressWarnings("unused")
     public final E remove() {
         if ( isEmpty() ) {
             throw new IllegalStateException("List is empty.");

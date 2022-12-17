@@ -11,11 +11,6 @@ public class CircularQueue<E> extends Queue<E> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return count == 0;
-    }
-
-    @Override
     public void clear() {
         index = null;
         count = 0;

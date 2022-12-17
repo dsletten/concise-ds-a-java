@@ -1,16 +1,19 @@
 package containers;
 
 import java.util.Arrays;
-import java.util.function.BiPredicate;
+import java.util.Objects;
 
 public class ArrayList<E> extends MutableList<E> {
-    private static final int DEFAULT_CAPACITY = 20;
-    private final java.util.ArrayList<E> store = new java.util.ArrayList<>(DEFAULT_CAPACITY);
+    private final Vector store = new Vector();
 
     public ArrayList() {}
 
     public ArrayList(E fillElt) {
         super(fillElt);
+    }
+
+    protected ArrayList<E> makeEmptyList() {
+        return new ArrayList<>(getFillElt());
     }
 
     @Override
@@ -20,64 +23,64 @@ public class ArrayList<E> extends MutableList<E> {
 
     @Override
     public boolean isEmpty() {
-        return store.isEmpty();
+//        return store.isEmpty();
+        return size() == 0;
     }
 
     @Override
-    public void doClear() {
+    protected void doClear() {
         store.clear();
     }
 
-    @Override
-//    public Iterator<E> iterator() {
-//        return new RandomAccessListIterator();
-//    }
     public Iterator<E> iterator() {
-        return new MutableCollectionIterator<>(new Cursor<E>() {
-            private int cursor = 0;
-
-            @Override
-            public boolean isDone() {
-                return cursor == size();
-            }
-
-            @Override
-            public E current() {
-                return get(cursor);
-            }
-
-            @Override
-            public void advance() {
-                cursor++;
-            }
-        }, () -> getModificationCount());
+        return new MutableCollectionIterator<>(CursorFactory.makeRandomAccessListCursor(this),
+                () -> modificationCount);
     }
 
-    @Override
-    public E contains(E object, BiPredicate<E, E> test) {
-        for (E elt : store) {
-            if ( test.test(object, elt) ) {
-                return elt;
-            }
-        }
-
-        return null;
+    public ListIterator<E> listIterator(int start) {
+        return new RandomAccessListListIterator<>(this, start, new RemoteControl().addCommand("modificationCount", () -> modificationCount));
     }
-
-    @Override
     @SuppressWarnings("unchecked")
-    protected void doAdd(E... objs) {
-        store.addAll(Arrays.asList(objs));
+    @Override
+    protected ArrayList<E> doDoAdd(E... objs) {
+//        for (E elt : objs) {
+//            store.pushExtend(elt);
+//        }
+        store.addAll(objs);
+
+        return this;
+    }
+
+    protected void shiftUp(int low) {
+        shiftUp(low, size());
+    }
+
+    protected void shiftUp(int low, int high) {
+        store.shiftUp(low, high);
+    }
+
+    protected void shiftDown(int low) {
+        shiftDown(low, size());
+    }
+
+    protected void shiftDown(int low, int high) {
+        store.shiftDown(low, high);
     }
 
     @Override
     protected void doDoInsert(int i, E obj) {
-        store.add(i, obj);
+        store.pushExtend(getFillElt());
+        shiftUp(i);
+        set(i, obj);
     }
 
     @Override
     protected E doDoDelete(int i) {
-        return store.remove(i);
+        E doomed = get(i);
+        shiftDown(i + 1);
+        store.pop();
+
+        return doomed;
     }
 
     @Override
@@ -90,25 +93,9 @@ public class ArrayList<E> extends MutableList<E> {
         store.set(i, obj);
     }
 
-    @Override
-    public int index(E obj, BiPredicate<E, E> test) {
-        for (int i = 0; i < store.size(); i++) {
-            if ( test.test(obj, get(i)) ) {
-                return i;
-            }
-        }
-
-        return NOT_PRESENT;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     protected List<E> doSlice(int i, int n) {
-        //    Most straightforward! But does not follow use of add() to fill slice...
-//        ArrayList<E> slice = new ArrayList<>(getFillElt());
-//        slice.store.addAll(this.store.subList(i, n));
-//        return slice;
-        //    Extract to helper method...
         List<E> list = new ArrayList<>(getFillElt());
         int start = Math.min(i, size());
         int end = Math.min(i+n, size());
@@ -120,55 +107,78 @@ public class ArrayList<E> extends MutableList<E> {
         list.add((E[]) slice);
 
         return list;
-//        int size = size();
-//        if ( i < 0 ) {
-//            int j = i + size;
-//            if ( j < 0 ) {
-//                return new ArrayList<>();
-//            } else {
-//                return subList(j, Math.min(j + n, size));
-//            }
-//        } else {
-//            return subList(Math.min(i, size), Math.min(i + n, size));
-//        }
     }
 
-    //    TODO: Fix this to use constructor!! Object[] -> E[]
-//    @SuppressWarnings("unchecked")
-//    private List<E> subList(int start, int end) {
-//        ArrayList<E> slice = new ArrayList<>();
-//        for (Object elt : store.subList(start, end)) {
-//            slice.add((E) elt);
-//        }
-//        return slice;
-//    }
+    protected class Vector {
+        private static final int DEFAULT_INITIAL_SIZE = 20;
+        private int active = 0;
+        @SuppressWarnings("unchecked")
+        private E[] v = (E[]) new Object[DEFAULT_INITIAL_SIZE];
 
-//    private class RandomAccessListIterator extends MutableListIteratorOld<E> {
-//        private int cursor = 0;
-//
-//        //    Shouldn't give access to enclosing list?!
-//        //    Tension between inner class and code reuse!!
-//        private RandomAccessListIterator() {
-//            super(ArrayList.this);
-//        }
-//
-//        @Override
-//        protected boolean doIsDone() {
-//            return cursor == size();
-//        }
-//
-//        @Override
-//        protected E doDoCurrent() {
-//            return get(cursor);
-//        }
-//
-//        @Override
-//        protected void doNext() {
-//            if ( !isDone() ) {
-//                cursor++;
-//            }
-//        }
-//    }
+        protected int size() {
+            return active;
+        }
+
+        protected E get(int i) {
+            Objects.checkIndex(i, active);
+            return v[i];
+        }
+
+        protected void set(int i, E obj) {
+            Objects.checkIndex(i, active);
+            v[i] = obj;
+        }
+
+        protected boolean isEmpty() {
+            return active == 0;
+        }
+
+        protected void clear() {
+            for (int i = 0; i < active; i++) {
+                v[i] = null;
+            }
+
+            active = 0;
+        }
+
+        protected void pushExtend(E obj) {
+            if ( active == v.length ) {
+                extend();
+            }
+
+            v[active++] = obj;
+        }
+
+        @SuppressWarnings("unchecked")
+        protected void addAll(E... objs) {
+            while ( active + objs.length > v.length ) {
+                extend();
+            }
+
+            System.arraycopy(objs, 0, v, active, objs.length);
+            active += objs.length;
+        }
+        protected E pop() {
+            if ( isEmpty() ) {
+                throw new IllegalStateException("Vector is empty.");
+            } else {
+                E doomed = v[active];
+                v[active--] = null;
+                return doomed;
+            }
+        }
+        private void extend() {
+            v = Arrays.copyOf(v, v.length * 2);
+        }
+
+        protected void shiftUp(int low, int high) {
+            System.arraycopy(v, low, v, low+1, high-low);
+        }
+
+        protected void shiftDown(int low, int high) {
+            System.arraycopy(v, low, v, low-1, high-low);
+        }
+    }
 
     public static void main(String[] args) {
         List<Integer> al = new ArrayList<>();
@@ -177,6 +187,7 @@ public class ArrayList<E> extends MutableList<E> {
         al.add(6);
         al.add(8);
 
+        System.out.println(al.delete(0));
         System.out.println(al.size());
         System.out.println(al);
 
@@ -207,5 +218,22 @@ public class ArrayList<E> extends MutableList<E> {
 
         System.out.println(al.contains(2));
         System.out.println(al.contains(2, (item, elt) -> elt == Math.pow(item, 3)));
+
+        ListIterator<Integer> li = al.listIterator();
+        System.out.println(li.current());
+        System.out.println(li.currentIndex());
+        li.next();
+        System.out.println(li.current());
+        li.addBefore(-99);
+        li.addAfter(-98);
+        System.out.println(al);
+
+        li = al.listIterator(al.size()-1);
+        System.out.println(li.current());
+        li.previous();
+        System.out.println(li.current());
+
+        al.clear();
+        al.fill(20, n -> n + 1);
     }
 }

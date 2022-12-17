@@ -3,17 +3,14 @@ package containers;
 import java.util.function.Supplier;
 
 public class MutableCollectionIterator<E> extends Iterator<E> {
+    @SuppressWarnings("FieldMayBeFinal")
     private int expectedModificationCount;
-    private Supplier<Integer> modificationCount;
+    private final Supplier<Integer> modificationCount;
 
     public MutableCollectionIterator(Cursor<E> cursor, Supplier<Integer> modificationCount) {
         super(cursor);
         this.modificationCount = modificationCount;
         expectedModificationCount = modificationCount.get();
-    }
-
-    private boolean comodified() {
-        return expectedModificationCount != modificationCount.get();
     }
 
     @Override
@@ -39,8 +36,11 @@ public class MutableCollectionIterator<E> extends Iterator<E> {
 
     private void checkComodification() {
         if ( comodified() ) {
-            throw new IllegalStateException("List iterator invalid due to structural modification of collection.");
+            throw new IllegalStateException("Iterator invalid due to structural modification of collection.");
         }
     }
 
+    private boolean comodified() {
+        return expectedModificationCount != modificationCount.get();
+    }
 }

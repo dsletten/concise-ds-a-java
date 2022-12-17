@@ -2,9 +2,6 @@ package containers;
 
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-
 public class TestHashQueue {
     @Test
     public void testConstructor() {
@@ -27,13 +24,18 @@ public class TestHashQueue {
     }
 
     @Test
-    public void testDequeue() {
-        TestQueue.testDequeue(HashQueue::new);
+    public void testToArray() {
+        TestQueue.testToArray(HashQueue::new);
     }
 
     @Test
-    public void testFront() {
-        TestQueue.testFront(HashQueue::new);
+    public void testEnqueue() {
+        TestQueue.testEnqueue(HashQueue::new);
+    }
+
+    @Test
+    public void testFrontDequeue() {
+        TestQueue.testFrontDequeue(HashQueue::new);
     }
 
     @Test

@@ -3,6 +3,7 @@ package containers;
 import java.util.Arrays;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class List<E> extends Collection<E> {
     private final E fillElt;
@@ -15,6 +16,8 @@ public abstract class List<E> extends Collection<E> {
     protected List(E fillElt) {
         this.fillElt = fillElt;
     }
+
+    protected abstract List<E> makeEmptyList();
 
     @Override
     public String toString() {
@@ -35,28 +38,31 @@ public abstract class List<E> extends Collection<E> {
         return sb.toString();
     }
 
-    @Override
-    public boolean equals(Object o, BiPredicate<E, Object> test) {
+    //
+    //    See java.util.AbstractList.java
+    //
+    @Override  // ???
+    public boolean equals(Object o, BiPredicate<E, Object> pred) {
         if (o == this) {
             return true;
-        } else if (o instanceof PersistentList) {
+        } else if (o instanceof PersistentList) { // ????
+            //noinspection EqualsBetweenInconvertibleTypes
             return o.equals(this);
-        } else if (!(o instanceof List)) {
+        } else if (!(o instanceof List<?> list)) {  // Suggested by IntelliJ!!
             return false;
         } else {
-            List<Object> list = (List<Object>) o;
+//            List<Object> list = (List<Object>) o;
 
             if (list.size() != this.size()) {
                 return false;
             } else {
-//            final int expectedModCount = modCount;    java.util.ArrayList
-
                 Iterator<E> i1 = iterator();
 //                Iterator<E> i2 = ((List<E>) o).iterator();
-                Iterator<Object> i2 = list.iterator();
+//                Iterator<Object> i2 = list.iterator();
+                Iterator<?> i2 = list.iterator();
 
                 while (!i1.isDone() && !i2.isDone()) {
-                    if (!test.test(i1.current(), i2.current())) {
+                    if (!pred.test(i1.current(), i2.current())) {
                         return false;
                     }
 
@@ -67,7 +73,6 @@ public abstract class List<E> extends Collection<E> {
                 return true;
             }
         }
-//            checkForComodification(expectedModCount);
     }
 
     @Override
@@ -80,15 +85,69 @@ public abstract class List<E> extends Collection<E> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public abstract void add(E... objs);
+    public final ListIterator<E> listIterator() {
+        return listIterator(0);
+    }
+    public abstract ListIterator<E> listIterator(int start);
 
     @SuppressWarnings("unchecked")
+    public final List<E> add(E... objs) {
+        if ( objs.length == 0 ) {
+            return this;
+        } else {
+            return doAdd(objs);
+        }
+    }
+    @SuppressWarnings("unchecked")
+    protected abstract List<E> doAdd(E... objs);
+
+    @Override
+    List<E> fill(int count, Function<Integer, E> generator) {
+        //noinspection unchecked
+        E[] elts = (E[]) new Object[count];
+
+        for (int i = 1; i <= count; i++) {
+            elts[i-1] = generator.apply(i);
+        }
+
+        add(elts);
+
+        return this;
+    }
+
+    @Override
+//    public E[] elements() {
+    public <T> T[] toArray(T[] a) {
+        //noinspection unchecked
+        E[] elements = (E[]) new Object[size()];
+        int i = 0;
+        int count = size();
+
+        Iterator<E> iterator = iterator();
+
+        while (!iterator.isDone()) {
+            elements[i++] = iterator.current();
+            iterator.next();
+        }
+
+        clear();
+
+        //noinspection unchecked
+        return (T[]) Arrays.copyOf(elements, count, a.getClass());
+    }
+
+    @SuppressWarnings("unchecked")
+//    protected void extendList(int i, E obj) {
+//        Object[] objs = new Object[i - size() + 1];
+//        Arrays.fill(objs, fillElt);
+//        objs[objs.length - 1] = obj;
+//        add((E[]) objs); // ?!?!?!
+//    }
     protected void extendList(int i, E obj) {
-        Object[] objs = new Object[i - size() + 1];
-        Arrays.fill(objs, fillElt);
-        objs[objs.length - 1] = obj;
-        add((E[]) objs); // ?!?!?!
+        E[] elts = (E[]) new Object[i - size() + 1];
+        Arrays.fill(elts, fillElt);
+        elts[elts.length - 1] = obj;
+        add(elts);
     }
 
     /**
@@ -96,6 +155,7 @@ public abstract class List<E> extends Collection<E> {
      * @param obj Insert obj at index i. If i is greater than the current size, extend the list.
      *            If i is negative, count backwards from the end of the list.
      */
+    @SuppressWarnings("JavadocDeclaration")
     public final void insert(int i, E obj) {
         if (i < 0) {
             int j = i + size();
@@ -119,12 +179,12 @@ public abstract class List<E> extends Collection<E> {
             if (j >= 0) {
                 return delete(j);
             } else {
-                throw new IndexOutOfBoundsException("Invalid index");
+                throw new IndexOutOfBoundsException("Invalid index: " + i);  // ???
             }
         } else if (i < size()) {
             return doDelete(i);
         } else {
-            throw new IndexOutOfBoundsException("Invalid index");
+            throw new IndexOutOfBoundsException("Invalid index: " + i);  // ???
         }
     }
 
@@ -156,6 +216,8 @@ public abstract class List<E> extends Collection<E> {
 
     /*
      *    Identical to insert()
+     *    Thus, set() can modify list structure if list is extended. extendList() calls add(), which
+     *    updates modification count.
      */
     public final void set(int i, E obj) {
         if (i < 0) {
@@ -176,7 +238,23 @@ public abstract class List<E> extends Collection<E> {
         return index(obj, (item, elt) -> item == elt);
     }
 
-    public abstract int index(E obj, BiPredicate<E, E> test);
+    public int index(E obj, BiPredicate<E, E> test) {
+        Iterator<E> iterator = iterator();
+        int i = 0;
+
+        while (!iterator.isDone()) {
+            E elt = iterator.current();
+
+            if (test.test(obj, elt)) {
+                return i;
+            }
+
+            iterator.next();
+            i++;
+        }
+
+        return NOT_PRESENT;
+    }
 
 //    public final List<E> slice(int i) {
 //        if (i < 0) {
@@ -231,5 +309,21 @@ public abstract class List<E> extends Collection<E> {
 
     public E getFillElt() {
         return fillElt;
+    }
+
+    public List<E> reverse() {
+        //noinspection unchecked
+        E[] reversed = (E[]) new Object[size()];
+        int index = size() - 1;
+
+        Iterator<E> iterator = iterator();
+
+        while (!iterator.isDone()) {
+            reversed[index--] = iterator.current();
+
+            iterator.next();
+        }
+
+        return makeEmptyList().add(reversed);
     }
 }

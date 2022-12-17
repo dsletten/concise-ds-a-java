@@ -29,13 +29,33 @@ public class TestDoublyLinkedList {
     }
 
     @Test
+    public void testContainsPredicate() {
+        TestList.testContainsPredicate(DoublyLinkedList::new);
+    }
+
+    @Test
+    public void testEquals() {
+        TestList.testEquals(DoublyLinkedList::new);
+    }
+
+    @Test
+    public void testEqualsPredicate() {
+        TestList.testEqualsPredicate(DoublyLinkedList::new);
+    }
+
+    @Test
     public void testEach() {
-        TestList.testEach(DoublyLinkedList<Character>::new);
+        TestList.testEach(DoublyLinkedList::new);
+    }
+
+    @Test
+    public void testAdd() {
+        TestList.testAdd(DoublyLinkedList::new);
     }
 
     @Test
     public void testInsertFillNull() {
-        TestList.testInsertFillNull(DoublyLinkedList<String>::new);
+        TestList.testInsertFillNull(DoublyLinkedList::new);
     }
 
     @Test
@@ -45,56 +65,56 @@ public class TestDoublyLinkedList {
 
     @Test
     public void testInsertNegativeIndex() {
-        TestList.testInsertNegativeIndex(DoublyLinkedList<Integer>::new);
+        TestList.testInsertNegativeIndex(DoublyLinkedList::new);
     }
 
     @Test
     public void testInsertEnd() {
-        TestList.testInsertEnd(DoublyLinkedList<Integer>::new);
+        TestList.testInsertEnd(DoublyLinkedList::new);
     }
 
     @Test
     public void testDelete() {
-        TestList.testDelete(DoublyLinkedList<Integer>::new);
+        TestList.testDelete(DoublyLinkedList::new);
     }
 
     @Test
     public void testDeleteNegativeIndex() {
-        TestList.testDeleteNegativeIndex(DoublyLinkedList<Integer>::new);
+        TestList.testDeleteNegativeIndex(DoublyLinkedList::new);
     }
 
     @Test
     public void testGet() {
-        TestList.testGet(DoublyLinkedList<Integer>::new);
+        TestList.testGet(DoublyLinkedList::new);
     }
 
     @Test
     public void testGetNegativeIndex() {
-        TestList.testGetNegativeIndex(DoublyLinkedList<Integer>::new);
+        TestList.testGetNegativeIndex(DoublyLinkedList::new);
     }
 
     @Test
     public void testSet() {
-        TestList.testSet(DoublyLinkedList<Integer>::new);
+        TestList.testSet(DoublyLinkedList::new);
     }
 
     @Test
     public void testIndex() {
-        TestList.testIndex(DoublyLinkedList<Integer>::new);
+        TestList.testIndex(DoublyLinkedList::new);
     }
 
     @Test
     public void testSlice() {
-        TestList.testSlice(DoublyLinkedList<Integer>::new);
+        TestList.testSlice(DoublyLinkedList::new);
     }
 
     @Test
     public void testSliceCornerCases() {
-        TestList.testSliceCornerCases(DoublyLinkedList<Integer>::new);
+        TestList.testSliceCornerCases(DoublyLinkedList::new);
     }
 
     @Test
     public void testTime() {
-        TestList.testTime(DoublyLinkedList<Integer>::new);
+        TestList.testTime(DoublyLinkedList::new);
     }
 }

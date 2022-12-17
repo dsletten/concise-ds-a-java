@@ -2,6 +2,7 @@ package containers;
 
 import java.util.function.Supplier;
 
+@SuppressWarnings("ALL")
 public class MutableCollectionIteratorRC<E> extends IteratorRC<E> {
     private int expectedModificationCount;
     private Supplier<Integer> modificationCount;
@@ -16,7 +17,7 @@ public class MutableCollectionIteratorRC<E> extends IteratorRC<E> {
 //        return expectedModificationCount != modificationCount.get();
 //    }
 
-    public MutableCollectionIteratorRC(RemoteControl<E> remoteControl, Supplier<Integer> modificationCount) {
+    public MutableCollectionIteratorRC(RemoteControlIterator<E> remoteControl, Supplier<Integer> modificationCount) {
         super(remoteControl);
         this.modificationCount = modificationCount;
     }

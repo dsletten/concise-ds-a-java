@@ -1,5 +1,8 @@
 package containers;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
 public abstract class Queue<E> extends Dispenser<E> {
     @Override
     public boolean isEmpty() {
@@ -34,4 +37,29 @@ public abstract class Queue<E> extends Dispenser<E> {
     }
 
     protected abstract E doFront();
+
+    @Override
+    Queue<E> fill(int count, Function<Integer, E> generator) {
+        for (int i = 1; i <= count; i++) {
+            enqueue(generator.apply(i));
+        }
+
+        return this; // Must cast for Deque?!
+    }
+
+    @Override
+//    public E[] elements() {
+    public <T> T[] toArray(T[] a) {
+//        E[] elements = (E[]) new Object[size()];
+        Object[] elements = new Object[size()];
+        int i = 0;
+        int count = size();
+
+        while ( !isEmpty() ) {
+            elements[i++] = dequeue();
+        }
+
+        //noinspection unchecked
+        return (T[]) Arrays.copyOf(elements, count, a.getClass());
+    }
 }

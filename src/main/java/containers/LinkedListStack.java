@@ -1,7 +1,7 @@
 package containers;
 
 public class LinkedListStack<E> extends Stack<E> {
-    private List<E> list = new SinglyLinkedList<>();
+    private final List<E> list = new SinglyLinkedListX<>();
 
     @Override
     public int size() {

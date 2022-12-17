@@ -24,13 +24,18 @@ public class TestRecyclingQueue {
     }
 
     @Test
-    public void testDequeue() {
-        TestQueue.testDequeue(RecyclingQueue::new);
+    public void testToArray() {
+        TestQueue.testToArray(RecyclingQueue::new);
     }
 
     @Test
-    public void testFront() {
-        TestQueue.testFront(RecyclingQueue::new);
+    public void testEnqueue() {
+        TestQueue.testEnqueue(RecyclingQueue::new);
+    }
+
+    @Test
+    public void testFrontDequeue() {
+        TestQueue.testFrontDequeue(RecyclingQueue::new);
     }
 
     @Test

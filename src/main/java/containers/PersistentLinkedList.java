@@ -58,18 +58,14 @@ public class PersistentLinkedList<E> extends PersistentList<E> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public PersistentList<E> add(E... objs) {
-        if ( objs.length == 0 ) {
-            return this;
-        } else {
-            Node<E> node = null;
+    public PersistentList<E> doAdd(E... objs) {
+        Node<E> node = null;
 
-            for (int i = objs.length - 1; i >= 0; i--) {
-                node = new Node(objs[i], node);
-            }
-
-            return new PersistentLinkedList(getFillElt(), Node.append(store, node),count + objs.length);
+        for (int i = objs.length - 1; i >= 0; i--) {
+            node = new Node<>(objs[i], node);
         }
+
+        return new PersistentLinkedList<>(getFillElt(), Node.append(store, node), count + objs.length);
     }
 
     @Override
@@ -79,7 +75,7 @@ public class PersistentLinkedList<E> extends PersistentList<E> {
 
     @Override
     protected PersistentLinkedList<E> doDelete(int i) {
-        return new PersistentLinkedList<>(getFillElt(), adjustNode(store, i, node -> node.rest()), count - 1);
+        return new PersistentLinkedList<>(getFillElt(), adjustNode(store, i, Node::rest), count - 1);
     }
 
     @Override
@@ -195,12 +191,14 @@ public class PersistentLinkedList<E> extends PersistentList<E> {
         System.out.println(pl.slice(-3, 5));
         System.out.println(pl.slice(-20, 3));
 
-        pl.each(integer -> System.out.println(integer));
+        pl.each(System.out::println);
 
-        ArrayList<Integer> al = new ArrayList<>();
-        pl.each(i -> al.add(i));
+        ArrayListJ<Integer> al = new ArrayListJ<>();
+        pl.each(al::add);
 
+        //noinspection EqualsBetweenInconvertibleTypes
         System.out.println(al.equals(pl));
+        //noinspection EqualsBetweenInconvertibleTypes
         System.out.println(pl.equals(al));
     }
 }

@@ -3,9 +3,11 @@ package containers;
 import java.util.Arrays;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class PersistentList<E> extends PersistentCollection<E> {
     private final E fillElt;
+    @SuppressWarnings("unused")
     public static final int NOT_PRESENT = -1;
 
     protected PersistentList() {
@@ -44,6 +46,7 @@ public abstract class PersistentList<E> extends PersistentCollection<E> {
         } else if (!(o instanceof PersistentList)) {
             return mixedEquals(this, o, test);
         } else {
+            //noinspection unchecked
             return persistentEquals(this, (PersistentList<Object>) o, test);
         }
     }
@@ -52,6 +55,7 @@ public abstract class PersistentList<E> extends PersistentCollection<E> {
         if ( !(o instanceof List) ) {
             return false;
         } else {
+            //noinspection unchecked
             List<Object> list = (List<Object>) o;
 
             if (list.size() != pl.size()) {
@@ -107,7 +111,46 @@ public abstract class PersistentList<E> extends PersistentCollection<E> {
     }
 
     @SuppressWarnings("unchecked")
-    public abstract PersistentList<E> add(E... objs);
+    public PersistentList<E> add(E... objs) {
+        if ( objs.length == 0 ) {
+            return this;
+        } else {
+            return doAdd(objs);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected abstract PersistentList<E> doAdd(E... objs);
+
+    @Override
+    PersistentList<E> fill(int count, Function<Integer, E> generator) {
+        //noinspection unchecked
+        E[] elts = (E[]) new Object[count];
+
+        for (int i = 1; i <= count; i++) {
+            elts[i] = generator.apply(i);
+        }
+
+        add(elts);
+
+        return this;
+    }
+
+    public <T> T[] toArray(T[] a) {
+        //noinspection unchecked
+        E[] elements = (E[]) new Object[size()];
+        int i = 0;
+        PersistentIterator<E> iterator = iterator();
+
+        while (!iterator.isDone()) {
+            elements[i++] = iterator.current();
+            iterator = iterator.next();
+        }
+
+
+        //noinspection unchecked
+        return (T[]) Arrays.copyOf(elements, size(), a.getClass());
+    }
 
     @SuppressWarnings("unchecked")
     protected PersistentList<E> extendList(int i, E obj) {
@@ -125,6 +168,7 @@ public abstract class PersistentList<E> extends PersistentCollection<E> {
      * Insert obj at index i. If i is greater than the current size, extend the list.
      * If i is negative, count backwards from the end of the list.
      */
+    @SuppressWarnings("JavadocDeclaration")
     public final PersistentList<E> insert(int i, E obj) {
         if (i < 0) {
             int j = i + size();
@@ -211,7 +255,7 @@ public abstract class PersistentList<E> extends PersistentCollection<E> {
     protected abstract PersistentList<E> doSet(int i, E obj);
 
     public int index(E obj) {
-        return index(obj, (item, elt) -> item.equals(elt));
+        return index(obj, Object::equals);
     }
 
     public abstract int index(E obj, BiPredicate<E, E> test);

@@ -5,7 +5,7 @@ package containers;
 //    Everything that is a subclass of List<E> is actually a mutable list...
 //
 public abstract class MutableList<E> extends List<E> {
-    private int modificationCount = 0;
+    protected int modificationCount = 0;
 
     protected MutableList() {
         super();
@@ -25,15 +25,17 @@ public abstract class MutableList<E> extends List<E> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final void add(E... objs) {
+    public final MutableList<E> doAdd(E... objs) {
         if ( objs.length > 0 ) {
             countModification();
-            doAdd(objs);
+            return doDoAdd(objs);
+        } else {
+            return this;
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected abstract void doAdd(E... objs);
+    protected abstract MutableList<E> doDoAdd(E... objs);
 
     @Override
     protected final void doInsert(int i, E obj) {
@@ -55,7 +57,14 @@ public abstract class MutableList<E> extends List<E> {
         modificationCount++;
     }
 
-    protected int getModificationCount() {
-        return modificationCount;
-    }
+//    protected int getModificationCount() {
+//        return modificationCount;
+//    }
+
+//    Only mutable List<Integer>?!
+//    protected List<Integer> fill(int count) {
+//        for (int i = 1; i < count; i++) {
+//            add(i);
+//        }
+//    }
 }

@@ -1,13 +1,16 @@
 package containers;
 
-import java.util.function.BiPredicate;
-
 public class SinglyLinkedList<E> extends MutableLinkedList<E> {
     private Node<E> store = null;
     private int count = 0;
 
     public SinglyLinkedList() {
         super();
+    }
+
+    @Override
+    protected List<E> makeEmptyList() {
+        return new SinglyLinkedList<>(getFillElt());
     }
 
     public SinglyLinkedList(E fillElt) {
@@ -55,37 +58,46 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
 //                    }
 //                }, () -> getModificationCount());
 //    }
+//    public Iterator<E> iterator() {
+//        return new MutableCollectionIterator<>(new Cursor<E>() {
+//            private Node<E> cursor = store;
+//
+//            @Override
+//            public boolean isDone() {
+//                return cursor == null;
+//            }
+//
+//            @Override
+//            public E current() {
+//                return cursor.first();
+//            }
+//
+//            @Override
+//            public void advance() {
+//                cursor = cursor.rest();
+//            }
+//        }, () -> getModificationCount());
+//    }
     public Iterator<E> iterator() {
-        return new MutableCollectionIterator<>(new Cursor<E>() {
-            private Node<E> cursor = store;
-
-            @Override
-            public boolean isDone() {
-                return cursor == null;
-            }
-
-            @Override
-            public E current() {
-                return cursor.first();
-            }
-
-            @Override
-            public void advance() {
-                cursor = cursor.rest();
-            }
-        }, () -> getModificationCount());
+        return new MutableCollectionIterator<>(CursorFactory.makeSinglyLinkedListCursor(store),
+                () -> modificationCount);
     }
 
-    @Override
-    public E contains(E object, BiPredicate<E, E> equalityTest) {
-        return Node.contains(store, object, equalityTest);
+    public ListIterator<E> listIterator(int start) {
+        return new SinglyLinkedListListIterator<>(this, start,
+                new RemoteControl().addCommand("modificationCount", () -> modificationCount).addCommand("headNode", () -> store));
     }
+
+//    @Override
+//    public E contains(E object, BiPredicate<E, E> equalityTest) {
+//        return Node.contains(store, object, equalityTest);
+//    }
 
     @Override
 //    @SafeVarargs // ????
 //    public final void add(E... objs) {
     @SuppressWarnings("unchecked")
-    public void doAdd(E... objs) {
+    public SinglyLinkedList<E> doDoAdd(E... objs) {
         Node<E> node = null;
 
         for (int i = objs.length - 1; i >= 0; i--) {
@@ -99,6 +111,8 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
         }
 
         count += objs.length;
+
+        return this;
     }
 
     @Override
@@ -109,19 +123,20 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
 //            Node<E> head = Node.nthCdr(store, i - 1);
 //            head.setRest(new Node<>(obj, head.rest()));
 //        }
+        //noinspection ConstantConditions
         Node.nthCdr(store, i).spliceBefore(obj);
 
         count++;
     }
 
     @Override
-    protected void doInsertBefore(Node<E> node, E obj) {
+    protected void doInsertBefore(LinkedNode<E> node, E obj) {
         node.spliceBefore(obj);
         count++;
     }
 
     @Override
-    protected void doInsertAfter(Node<E> node, E obj) {
+    protected void doInsertAfter(LinkedNode<E> node, E obj) {
         node.spliceAfter(obj);
         count++;
     }
@@ -136,6 +151,7 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
 //            Node<E> head = Node.nthCdr(store, i - 1);
 //            E doomed = head.rest().first();
 //            head.setRest(head.rest().rest());
+            //noinspection ConstantConditions
             doomed = Node.nthCdr(store, i - 1).exciseChild();
         }
 
@@ -144,7 +160,7 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected E doDeleteNode(Node<E> doomed) {
+    protected E doDeleteNode(LinkedNode<E> doomed) {
         if (doomed == store) {
             store = store.rest();
         } else {
@@ -152,11 +168,11 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
         }
 
         count--;
-        return doomed.first();
+        return ((Node<E>) doomed).first();
     }
 
     @Override
-    protected E doDeleteChild(Node<E> parent) {
+    protected E doDeleteChild(LinkedNode<E> parent) {
         count--;
         return parent.exciseChild();
     }
@@ -171,10 +187,10 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
         Node.setNth(store, i, obj);
     }
 
-    @Override
-    public int index(E obj, BiPredicate<E, E> test) {
-        return Node.index(store, obj, test);
-    }
+//    @Override
+//    public int index(E obj, BiPredicate<E, E> test) {
+//        return Node.index(store, obj, test);
+//    }
 
     @Override
     protected List<E> doSlice(int i, int n) {
@@ -248,6 +264,21 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
         System.out.println(sll.slice(-3, 5));
         System.out.println(sll.slice(-20, 3));
 
-        sll.each(integer -> System.out.println(integer));
+//        sll.each(integer -> System.out.println(integer));
+        sll.each(System.out::println);
+
+        ListIterator<Integer> li = sll.listIterator();
+        System.out.println(li.current());
+        System.out.println(li.currentIndex());
+        li.next();
+        System.out.println(li.current());
+        li.addBefore(-99);
+        li.addAfter(-98);
+        System.out.println(sll);
+
+        li = sll.listIterator(sll.size()-1);
+        System.out.println(li.current());
+        li.previous();
+        System.out.println(li.current());
     }
 }

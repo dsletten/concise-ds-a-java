@@ -1,18 +1,13 @@
 package containers;
 
 public class LinkedQueue<E> extends Queue<E> {
-    protected Node<E> front = null;  // These fields are protected to facilitate RecyclingQueue/RingBuffer...Ugh
+    protected Node<E> front = null;  // These fields are protected to facilitate RecyclingQueue...Ugh
     protected Node<E> rear = null;
     protected int count = 0;
 
     @Override
     public int size() {
         return count;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
     }
 
     @Override
@@ -23,13 +18,15 @@ public class LinkedQueue<E> extends Queue<E> {
 
     @Override
     public void enqueue(E elt) {
-        if ( front == null ) {
+        Node<E> node = new Node<>(elt, null);
+
+        if ( isEmpty() ) {
             if ( rear != null ) {
                 throw new IllegalStateException("Queue is in illegal state.");
             }
-            rear = front = new Node<>(elt, null);
+            rear = front = node;
         } else {
-            rear = rear.setRest(new Node<>(elt, null));
+            rear = rear.setRest(node);
         }
         count++;
     }

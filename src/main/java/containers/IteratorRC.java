@@ -15,9 +15,9 @@ public abstract class IteratorRC<E> {
 //        this.next = next;
 //    }
 
-    private RemoteControl<E> remoteControl;
+    private final RemoteControlIterator<E> remoteControl;
 
-    public IteratorRC(RemoteControl<E> remoteControl) {
+    public IteratorRC(RemoteControlIterator<E> remoteControl) {
         this.remoteControl = remoteControl;
     }
 

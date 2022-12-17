@@ -29,82 +29,102 @@ public class TestHashList {
     }
 
     @Test
+    public void testContainsPredicate() {
+        TestList.testContainsPredicate(HashList::new);
+    }
+
+    @Test
+    public void testEquals() {
+        TestList.testEquals(HashList::new);
+    }
+
+    @Test
+    public void testEqualsPredicate() {
+        TestList.testEqualsPredicate(HashList::new);
+    }
+
+    @Test
     public void testEach() {
-        TestList.testEach(HashList<Character>::new);
+        TestList.testEach(HashList::new);
+    }
+
+    @Test
+    public void testAdd() {
+        TestList.testAdd(HashList::new);
     }
 
     @Test
     public void testInsertFillNull() {
-        TestList.testInsertFillNull(HashList<String>::new);
+        TestList.testInsertFillNull(HashList::new);
     }
 
     @Test
     public void testInsertFillZero() {
-        TestList.testInsertFillZero(() -> new HashList<Integer>(0));
+        TestList.testInsertFillZero(() -> new HashList<>(0));
     }
 
     @Test
     public void testInsertNegativeIndex() {
-        TestList.testInsertNegativeIndex(HashList<Integer>::new);
+        TestList.testInsertNegativeIndex(HashList::new);
     }
 
     @Test
     public void testInsertEnd() {
-        TestList.testInsertEnd(HashList<Integer>::new);
+        TestList.testInsertEnd(HashList::new);
     }
 
     @Test
     public void testDelete() {
-        TestList.testDelete(HashList<Integer>::new);
+        TestList.testDelete(HashList::new);
     }
 
     @Test
     public void testDeleteNegativeIndex() {
-        TestList.testDeleteNegativeIndex(HashList<Integer>::new);
+        TestList.testDeleteNegativeIndex(HashList::new);
     }
 
     @Test
     public void testGet() {
-        TestList.testGet(HashList<Integer>::new);
+        TestList.testGet(HashList::new);
     }
 
     @Test
     public void testGetNegativeIndex() {
-        TestList.testGetNegativeIndex(HashList<Integer>::new);
+        TestList.testGetNegativeIndex(HashList::new);
     }
 
     @Test
     public void testSet() {
-        TestList.testSet(HashList<Integer>::new);
+        TestList.testSet(HashList::new);
     }
 
     @Test
     public void testSetNegativeIndex() {
-        TestList.testSetNegativeIndex(HashList<Integer>::new);
+        TestList.testSetNegativeIndex(HashList::new);
     }
 
     @Test
     public void testSetOutOfBounds() {
-        TestList.testSetOutOfBounds(HashList<String>::new);
+        TestList.testSetOutOfBounds(HashList::new);
     }
 
     @Test
     public void testIndex() {
-        TestList.testIndex(HashList<Integer>::new);
+        TestList.testIndex(HashList::new);
     }
 
     @Test
     public void testSlice() {
-        TestList.testSlice(HashList<Integer>::new);
+        TestList.testSlice(HashList::new);
     }
 
     @Test
     public void testSliceCornerCases() {
-        TestList.testSliceCornerCases(HashList<Integer>::new);
+        TestList.testSliceCornerCases(HashList::new);
     }
 
     @Test
     public void testTime() {
-        TestList.testTime(HashList<Integer>::new);
+        TestList.testTime(HashList::new);
     }
 }

@@ -23,7 +23,7 @@ public class PersistentLinkedListStack<E> extends PersistentStack<E> {
     }
 
     @Override
-    public PersistentStack<E> clear() {
+    protected PersistentStack<E> makeEmptyPersistentStack() {
         return new PersistentLinkedListStack<>();
     }
 
@@ -39,6 +39,7 @@ public class PersistentLinkedListStack<E> extends PersistentStack<E> {
 
     @Override
     protected E doPeek() {
+        //noinspection unchecked
         return (E) list.get(0);
     }
 }
