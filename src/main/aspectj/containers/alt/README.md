@@ -51,7 +51,7 @@ Next, I addressed the Stateful Implementations of ArrayRingBuffer by making it a
 
 Then, I addressed the Stateful Implementations of ArrayRingBufferDeque, which desires to share some Stateful Implementations with ArrayRingBuffer. Instead of sharing the ArrayRingBuffer Stateful Implementations via Inheritance, I did so via Composition. I just created an instance of ArrayRingBuffer to which ArrayRingBufferDeque intances could delegate. This was made easier by a feature(?) of Java that I always forget: in addition to being visible to subclasses, "protected" fields are visible to classes in the same package.
 
-Note that since I extracted all Type information to Interfaces, however, ArrayRingBufferDeque extends NO Classes. I could probably have just had it extend ArrayRingBuffer, but that would have been less instructive.
+Note that since I extracted all Stateless Implementations and Type information to Interfaces, however, ArrayRingBufferDeque extends NO Classes. I could probably have just had it extend ArrayRingBuffer, but that would have been less instructive.
 
 Also note: once I got into this and realized that most of the shared implementations were stateless, the problem was much easier. In fact, the only Stateful Implementations were on leaf nodes of the inheritance hierarchy. The problem would have been much more interesting if "interior" Abstract Classes had had a Stateful Implementations that needed to be shared with a single subclass.
 
