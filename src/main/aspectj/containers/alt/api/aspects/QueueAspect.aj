@@ -1,24 +1,18 @@
 package containers.alt.api.aspects;
 
 import containers.alt.api.Queue;
+import containers.alt.api.Deque;
 
 public aspect QueueAspect {
 
-   pointcut callDequeue(Queue queue) :
-        execution(Object Queue.dequeue())
+   pointcut emptyCheck(Queue queue) :
+        (execution(Object Queue.dequeue())
+        || execution(Object Queue.front())
+        || execution(Object Deque.dequeueRear())
+        || execution(Object Deque.rear()))
         && target(queue);
 
-   pointcut callFront(Queue queue):
-        execution(Object Queue.front())
-        && target(queue);
-
-   before(Queue queue) : callDequeue(queue){
-       if(queue.isEmpty()){
-           throw new IllegalStateException();
-       }
-   }
-
-    before(Queue queue) : callFront(queue){
+    before(Queue queue) : emptyCheck(queue){
         if(queue.isEmpty()){
             throw new IllegalStateException();
         }
