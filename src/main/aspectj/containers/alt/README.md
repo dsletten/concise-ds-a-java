@@ -47,9 +47,9 @@ I started by creating Interfaces to separate the Type Hierarchy from the Class H
 
 Then, I noticed that MOST of the implementations were Stateless Implementations, so I defined them as default methods on their respective interfaces.
 
-Next, I addressed the Stateful Implementations -- which were all methods on ArrayRingBuffer. I made ArrayRingBuffer a concrete class and implemented them.
+Next, I addressed the Stateful Implementations of ArrayRingBuffer by making it a concrete class and implementing them.
 
-Next, I implemented ArrayRingBufferDeque, which desires to share some implementations with ArrayRingBuffer. Instead of sharing the implementations via Inheritance, I did so via Composition. I just created an instance of ArrayRingBuffer to which ArrayRingBufferDeque intances could delegate. This was made easier by a feature(?) of Java that I always forget: in addition to being visible to subclasses, "protected" fields are visible to classes in the same package.
+Then, I addressed the Stateful Implementations of ArrayRingBufferDeque, which desires to share some Stateful Implementations with ArrayRingBuffer. Instead of sharing the ArrayRingBuffer Stateful Implementations via Inheritance, I did so via Composition. I just created an instance of ArrayRingBuffer to which ArrayRingBufferDeque intances could delegate. This was made easier by a feature(?) of Java that I always forget: in addition to being visible to subclasses, "protected" fields are visible to classes in the same package.
 
 Note that since I extracted all Type information to Interfaces, however, ArrayRingBufferDeque extends NO Classes. I could probably have just had it extend ArrayRingBuffer, but that would have been less instructive.
 
