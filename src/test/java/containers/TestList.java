@@ -368,10 +368,13 @@ public class TestList {
         assertThat(slice.isEmpty()).isTrue();
     }
 
-    @SuppressWarnings("unused")
+
     public static void testReverse(Supplier<List<Integer>> f) {
+        testReverse(f, 1000);
+    }
+
+    public static void testReverse(Supplier<List<Integer>> f, int count) {
         List<Integer> original = f.get();
-        int count = 1000;
         fillList(original, count);
         List<Integer> backward = original.reverse();
 

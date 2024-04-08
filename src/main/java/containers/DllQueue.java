@@ -1,6 +1,6 @@
 package containers;
 
-public class DllQueue<E> extends Queue<E> {
+public class DllQueue<E> implements Queue<E> {
     private final List<E> list = new DoublyLinkedList<>();
 
     @Override
@@ -20,12 +20,12 @@ public class DllQueue<E> extends Queue<E> {
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         return list.delete(0);
     }
 
     @Override
-    protected E doFront() {
+    public E doFront() {
         return list.get(0);
     }
 }

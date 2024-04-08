@@ -1,7 +1,7 @@
 package containers;
 
 //    See ch. 6 exercise 5
-public class CircularQueue<E> extends Queue<E> {
+public class CircularQueue<E> implements Queue<E> {
     private Node<E> index = null;
     private int count = 0;
 
@@ -33,7 +33,7 @@ public class CircularQueue<E> extends Queue<E> {
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         E discard = front();
 
         if ( index == index.rest() ) {
@@ -48,7 +48,7 @@ public class CircularQueue<E> extends Queue<E> {
     }
 
     @Override
-    protected E doFront() {
+    public E doFront() {
         return index.rest().first();
     }
 }

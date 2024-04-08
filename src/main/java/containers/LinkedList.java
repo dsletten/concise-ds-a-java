@@ -1,6 +1,6 @@
 package containers;
 
-public abstract class LinkedList<E> extends List<E> {
+public abstract class LinkedList<E> extends AbstractList<E> {
     protected LinkedList() {
         super();
     }

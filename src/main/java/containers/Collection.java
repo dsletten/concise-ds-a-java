@@ -4,17 +4,22 @@ import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-public abstract class Collection<E> extends Container<E> {
-    public abstract Iterator<E> iterator();
+//
+//    Problems with `interface` vs. `abstract class`
+//    - Can't make top-level methods final to prevent overriding, e.g., pop() that doesn't check isEmpty()
+//    - Can't make hook methods protected, e.g., doPop()
+//
+public interface Collection<E> extends Container<E> {
+    Iterator<E> iterator();
 
 //    public final E contains(E object) {
 //        return contains(object, (item, elt) -> item == elt);
 //    }
-    public final E contains(E object) {
-    return contains(object, Objects::equals);
-}
+    default E contains(E object) {
+        return contains(object, Objects::equals);
+    }
 
-    public E contains(E object, BiPredicate<E, E> test) {
+    default E contains(E object, BiPredicate<E, E> test) {
         Iterator<E> iterator = iterator();
 
         while ( !iterator.isDone() ) {
@@ -30,13 +35,18 @@ public abstract class Collection<E> extends Container<E> {
         return null;
     }
 
-    public abstract void each(Consumer<E> f);
+    void each(Consumer<E> f);
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    @Override
-    public final boolean equals(Object o) {
-        return equals(o, Objects::equals);
-    }
+//    @Override
+//    default boolean equals(Object o) {
+//        return equals(o, Objects::equals);
+//    }
 
-    public abstract boolean equals(Object o, BiPredicate<E, Object> test);
+            //    Overload!
+//    default boolean equals(Collection o) {
+//        return equals(o, Objects::equals);
+//    }
+
+    boolean equals(Object o, BiPredicate<E, Object> test);
 }

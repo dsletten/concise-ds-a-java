@@ -10,7 +10,9 @@ public abstract class MutableLinkedList<E> extends MutableList<E> {
     }
 
     public final void insertBefore(LinkedNode<E> node, E obj) {
-        if ( node == null ) {
+        if ( isEmpty() ) {
+            throw new IllegalStateException("List is empty");
+        } else if ( node == null ) {
             throw new IllegalArgumentException("Invalid node");
         } else {
             doInsertBefore(node, obj);
@@ -21,7 +23,9 @@ public abstract class MutableLinkedList<E> extends MutableList<E> {
     protected abstract void doInsertBefore(LinkedNode<E> node, E obj);
 
     public final void insertAfter(LinkedNode<E> node, E obj) {
-        if ( node == null ) {
+        if ( isEmpty() ) {
+            throw new IllegalStateException("List is empty");
+        } else if ( node == null ) {
             throw new IllegalArgumentException("Invalid node");
         } else {
             doInsertAfter(node, obj);

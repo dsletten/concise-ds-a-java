@@ -14,7 +14,7 @@ public class DoublyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected List<E> makeEmptyList() {
+    public List<E> makeEmptyList() {
         return new DoublyLinkedList<>(getFillElt());
     }
 

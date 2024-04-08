@@ -3,7 +3,7 @@ package containers;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HashDeque<E> extends Deque<E> {
+public class HashDeque<E> implements Deque<E> {
     private Map<Integer, E> store = new HashMap<>();
     private int front = 0;
     private int rear = 0;
@@ -38,7 +38,7 @@ public class HashDeque<E> extends Deque<E> {
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         E discard = store.remove(front);
 
         if ( !isEmpty() ) {
@@ -49,7 +49,7 @@ public class HashDeque<E> extends Deque<E> {
     }
 
     @Override
-    protected E doDequeueRear() {
+    public E doDequeueRear() {
         E discard = store.remove(rear);
 
         if ( !isEmpty() ) {
@@ -60,12 +60,12 @@ public class HashDeque<E> extends Deque<E> {
     }
 
     @Override
-    protected E doFront() {
+    public E doFront() {
         return store.get(front);
     }
 
     @Override
-    protected E doRear() {
+    public E doRear() {
         return store.get(rear);
     }
 }

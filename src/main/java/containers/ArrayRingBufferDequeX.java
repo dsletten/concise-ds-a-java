@@ -4,7 +4,7 @@ package containers;
 //     - Design exercise in composition
 //     - Must violate encapsulation of contained ArrayRingBuffer????
 //
-public class ArrayRingBufferDequeX<E> extends Deque<E> {
+public class ArrayRingBufferDequeX<E> implements RingBufferDeque<E> {
     private final ArrayRingBuffer<E> ringBuffer = new ArrayRingBuffer<>();
 
     @Override
@@ -13,43 +13,49 @@ public class ArrayRingBufferDequeX<E> extends Deque<E> {
     }
 
     @Override
-    public void enqueue(E elt) {
+    public boolean isFull() {
+        return ringBuffer.isFull();
+    }
+
+    @Override
+    public void doResize() {
+        ringBuffer.resize();
+    }
+
+    @Override
+    public void doEnqueue(E elt) {
         ringBuffer.enqueue(elt);
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         return ringBuffer.dequeue();
     }
 
     @Override
-    public void enqueueFront(E elt) {
-        if ( ringBuffer.count == ringBuffer.store.length) {
-            ringBuffer.resize();
-        }
-
-        ringBuffer.front = ringBuffer.offset(-1);
-        ringBuffer.store[ringBuffer.offset(0)] = elt;
-        ringBuffer.count++;
+    public void doEnqueueFront(E elt) {
+        ringBuffer.retractFront();
+        ringBuffer.setElement(0, elt);
+        ringBuffer.incrementCount();
     }
 
     @Override
-    protected E doDequeueRear() {
+    public E doDequeueRear() {
         E discard = rear();
-        ringBuffer.store[ringBuffer.offset(ringBuffer.count - 1)] = null;
-        ringBuffer.count--;
+        ringBuffer.setElement(size() - 1, null);
+        ringBuffer.decrementCount();
 
         return discard;
     }
 
     @Override
-    protected E doFront() {
+    public E doFront() {
         return ringBuffer.front();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected E doRear() {
-        return (E) ringBuffer.store[ringBuffer.offset(ringBuffer.count-1)];
+    public E doRear() {
+        return (E) ringBuffer.getElement(size() - 1);
     }
 }

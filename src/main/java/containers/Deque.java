@@ -1,9 +1,11 @@
 package containers;
 
-public abstract class Deque<E> extends Queue<E> {
-    public abstract void enqueueFront(E elt);
+import java.util.function.Function;
 
-    public final E dequeueRear() {
+public interface Deque<E> extends Queue<E> {
+    void enqueueFront(E elt);
+
+    default E dequeueRear() {
         if ( isEmpty() ) {
             throw new IllegalStateException();
         } else {
@@ -11,9 +13,9 @@ public abstract class Deque<E> extends Queue<E> {
         }
     }
 
-    protected abstract E doDequeueRear();
+    E doDequeueRear();
 
-    public final E rear() {
+    default E rear() {
         if ( isEmpty() ) {
             throw new IllegalStateException(); // No EmptyQueueException!!
         } else {
@@ -21,5 +23,10 @@ public abstract class Deque<E> extends Queue<E> {
         }
     }
 
-    protected abstract E doRear();
+    E doRear();
+
+    @Override
+    default Deque<E> fill(int count, Function<Integer, E> generator) {
+        return (Deque<E>) Queue.super.fill(count, generator);
+    }
 }

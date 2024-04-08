@@ -64,7 +64,7 @@ public class TestDeque {
     }
     
     public static void testRearDequeueRear(Supplier<Deque<Integer>> f, int count) {
-        Deque<Integer> deque = (Deque<Integer>) f.get().fill(count, n -> n);
+        Deque<Integer> deque = f.get().fill(count, n -> n);
 
         for (int i = 1; i <= count; i++) {
             int rear = deque.rear();

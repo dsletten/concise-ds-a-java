@@ -3,7 +3,7 @@ package containers;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HashQueue<E> extends Queue<E> {
+public class HashQueue<E> implements Queue<E> {
     private final Map<Integer, E> store = new HashMap<>();
     private int front = 0;
     private int rear = 0;
@@ -31,7 +31,7 @@ public class HashQueue<E> extends Queue<E> {
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         E discard = store.remove(front);
         front++;
 
@@ -39,7 +39,7 @@ public class HashQueue<E> extends Queue<E> {
     }
 
     @Override
-    protected E doFront() {
+    public E doFront() {
         return store.get(front);
     }
 

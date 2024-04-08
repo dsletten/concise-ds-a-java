@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.function.Function;
 
-public abstract class Stack<E> extends Dispenser<E> {
+public abstract class Stack<E> implements Dispenser<E> {
     public abstract void push(E obj);
 
     public final E pop() {
@@ -27,8 +27,9 @@ public abstract class Stack<E> extends Dispenser<E> {
 
     protected abstract E doPeek();
 
+    //    Do I want this `public`? Interface forces it to be.
     @Override
-    Stack<E> fill(int count, Function<Integer, E> generator) {
+    public Stack<E> fill(int count, Function<Integer, E> generator) {
         for (int i = 1; i <= count; i++) {
             push(generator.apply(i));
         }

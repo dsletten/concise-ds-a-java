@@ -17,7 +17,7 @@ public class SinglyLinkedListX<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected List<E> makeEmptyList() {
+    public List<E> makeEmptyList() {
         return new SinglyLinkedListX<>(getFillElt());
     }
 

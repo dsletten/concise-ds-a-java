@@ -3,22 +3,22 @@ package containers;
 import java.util.Arrays;
 import java.util.function.Function;
 
-public abstract class Queue<E> extends Dispenser<E> {
+public interface Queue<E> extends Dispenser<E> {
     @Override
-    public boolean isEmpty() {
+    default boolean isEmpty() {
         return size() == 0;
     }
 
     @Override
-    public void clear() {
+    default void clear() {
         while ( !isEmpty() ) {
             dequeue();
         }
     }
 
-    public abstract void enqueue(E elt);
+    void enqueue(E elt);
 
-    public final E dequeue() {
+    default E dequeue() {
         if ( isEmpty() ) {
             throw new IllegalStateException();
         } else {
@@ -26,9 +26,9 @@ public abstract class Queue<E> extends Dispenser<E> {
         }
     }
 
-    protected abstract E doDequeue();
+    E doDequeue();
 
-    public final E front() {
+    default E front() {
         if ( isEmpty() ) {
             throw new IllegalStateException(); // No EmptyQueueException!!
         } else {
@@ -36,10 +36,10 @@ public abstract class Queue<E> extends Dispenser<E> {
         }
     }
 
-    protected abstract E doFront();
+    E doFront();
 
     @Override
-    Queue<E> fill(int count, Function<Integer, E> generator) {
+    default Queue<E> fill(int count, Function<Integer, E> generator) {
         for (int i = 1; i <= count; i++) {
             enqueue(generator.apply(i));
         }
@@ -49,7 +49,7 @@ public abstract class Queue<E> extends Dispenser<E> {
 
     @Override
 //    public E[] elements() {
-    public <T> T[] toArray(T[] a) {
+    default <T> T[] toArray(T[] a) {
 //        E[] elements = (E[]) new Object[size()];
         Object[] elements = new Object[size()];
         int i = 0;

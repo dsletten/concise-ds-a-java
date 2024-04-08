@@ -124,6 +124,11 @@ public class TestSinglyLinkedListX {
     }
 
     @Test
+    public void testReverse() {
+        TestList.testReverse(SinglyLinkedListX::new);
+    }
+
+    @Test
     public void testTime() {
         TestList.testTime(SinglyLinkedListX::new);
     }

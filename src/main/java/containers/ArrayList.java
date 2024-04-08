@@ -12,7 +12,7 @@ public class ArrayList<E> extends MutableList<E> {
         super(fillElt);
     }
 
-    protected ArrayList<E> makeEmptyList() {
+    public ArrayList<E> makeEmptyList() {
         return new ArrayList<>(getFillElt());
     }
 
@@ -94,20 +94,20 @@ public class ArrayList<E> extends MutableList<E> {
     }
 
     @SuppressWarnings("unchecked")
-    @Override
-    protected List<E> doSlice(int i, int n) {
-        List<E> list = new ArrayList<>(getFillElt());
-        int start = Math.min(i, size());
-        int end = Math.min(i+n, size());
-        Object[] slice = new Object[end-start];
-
-        for (int j = 0, k = start; j < slice.length; j++, k++) {
-            slice[j] = get(k);
-        }
-        list.add((E[]) slice);
-
-        return list;
-    }
+//    @Override
+//    protected List<E> doSlice(int i, int n) {
+//        List<E> list = new ArrayList<>(getFillElt());
+//        int start = Math.min(i, size());
+//        int end = Math.min(i+n, size());
+//        Object[] slice = new Object[end-start];
+//
+//        for (int j = 0, k = start; j < slice.length; j++, k++) {
+//            slice[j] = get(k);
+//        }
+//        list.add((E[]) slice);
+//
+//        return list;
+//    }
 
     protected class Vector {
         private static final int DEFAULT_INITIAL_SIZE = 20;

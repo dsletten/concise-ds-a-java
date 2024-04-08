@@ -3,60 +3,80 @@ package containers;
 /*
  *    This is the traditional `ring buffer`.
  */
-public class ArrayRingBuffer<E> extends RingBuffer<E> {
+public class ArrayRingBuffer<E> implements RingBuffer<E> {
     private static final int CAPACITY = 20;
 
-    //    These are exposed for the sake of ArrayRingBufferDequeX!
-    protected Object[] store = new Object[CAPACITY];
-    protected int front = 0;
-    protected int count = 0;
+    private Object[] store = new Object[CAPACITY];
+    private int front = 0;
+    private int count = 0;
+
+    protected E getElement(int i) {
+        return (E) store[offset(i)];
+    }
+    protected void setElement(int i, E obj) {
+        store[offset(i)] = obj;
+    }
+
+    protected void advanceFront() {
+        front = offset(1);
+    }
+
+    protected void retractFront() {
+        front = offset(-1);
+    }
+    protected void incrementCount() {
+        count++;
+    }
+
+    protected void decrementCount() {
+        count--;
+    }
 
     @Override
     public int size() {
         return count;
     }
 
-    protected int offset(int i) {
+    private int offset(int i) {
         return Utilities.mod(i + front, store.length);
     }
 
     @Override
-    public void enqueue(E elt) {
-        if (count == store.length) {
-            resize();
-        }
-
+    public void doEnqueue(E elt) {
         store[offset(count)] = elt;
-        count++;
+        incrementCount();
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         E discard = front();
         store[front] = null;
-        front = offset(1);
-        count--;
+        advanceFront();
+        decrementCount();
 
         return discard;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected E doFront() {
+    public E doFront() {
         return (E) store[front];
     }
 
-    void resize() {
-        if (count == store.length) {
-            Object[] newStore = new Object[store.length * 2];
-            for (int i = 0; i < count; i++) {
-                newStore[i] = store[offset(i)];
-            }
 
-            store = newStore;
-            front = 0;
-        } else {
-            throw new IllegalStateException("resize() called without full store."); // Test?
+    @Override
+    public boolean isFull() {
+        return count == store.length;
+    }
+
+    @Override
+    public void doResize() {
+        Object[] newStore = new Object[store.length * 2];
+        for (int i = 0; i < count; i++) {
+            newStore[i] = store[offset(i)];
         }
+
+        store = newStore;
+        front = 0;
     }
 }

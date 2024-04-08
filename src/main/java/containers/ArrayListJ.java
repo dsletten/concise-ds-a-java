@@ -13,7 +13,7 @@ public class ArrayListJ<E> extends MutableList<E> {
     }
 
     @Override
-    protected List<E> makeEmptyList() {
+    public List<E> makeEmptyList() {
         return new ArrayListJ<>(getFillElt());
     }
 

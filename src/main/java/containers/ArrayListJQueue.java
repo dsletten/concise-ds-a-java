@@ -3,7 +3,7 @@ package containers;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArrayListJQueue<E> extends Queue<E> {
+public class ArrayListJQueue<E> implements Queue<E> {
     private final List<E> store = new ArrayList<>();
 
     @Override
@@ -27,12 +27,12 @@ public class ArrayListJQueue<E> extends Queue<E> {
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         return store.remove(0);
     }
 
     @Override
-    protected E doFront() {
+    public E doFront() {
         return store.get(0);
     }
 }

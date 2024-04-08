@@ -1,7 +1,7 @@
 package containers;
 
-public class LinkedQueue<E> extends Queue<E> {
-    protected Node<E> front = null;  // These fields are protected to facilitate RecyclingQueue...Ugh
+public class LinkedQueue<E> implements Queue<E> {
+    protected Node<E> front = null;  // These fields are protected to facilitate RecyclingQueue, LinkedRingBuffer...Ugh
     protected Node<E> rear = null;
     protected int count = 0;
 
@@ -32,7 +32,7 @@ public class LinkedQueue<E> extends Queue<E> {
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         E discard = front();
         front = front.rest();
 
@@ -46,7 +46,7 @@ public class LinkedQueue<E> extends Queue<E> {
     }
 
     @Override
-    protected E doFront() {
+    public E doFront() {
         return front.first();
     }
 }

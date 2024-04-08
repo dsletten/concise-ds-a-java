@@ -1,6 +1,6 @@
 package containers;
 
-public class DllDeque<E> extends Deque<E> {
+public class DllDeque<E> implements Deque<E> {
     private List<E> list = new DoublyLinkedList<>();
 
     @Override
@@ -19,22 +19,22 @@ public class DllDeque<E> extends Deque<E> {
     }
 
     @Override
-    protected E doDequeue() {
+    public E doDequeue() {
         return list.delete(0);
     }
 
     @Override
-    protected E doDequeueRear() {
+    public E doDequeueRear() {
         return list.delete(-1);
     }
 
     @Override
-    protected E doFront() {
+    public E doFront() {
         return list.get(0);
     }
 
     @Override
-    protected E doRear() {
+    public E doRear() {
         return list.get(-1);
     }
 }

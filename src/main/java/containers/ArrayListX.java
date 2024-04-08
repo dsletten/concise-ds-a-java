@@ -12,7 +12,7 @@ public class ArrayListX<E> extends ArrayList<E> {
     }
 
     @SuppressWarnings("unused")
-    protected ArrayListX<E> makeEmptylist() {
+    public ArrayListX<E> makeEmptylist() {
         return new ArrayListX<>(getFillElt());
     }
 

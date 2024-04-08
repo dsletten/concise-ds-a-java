@@ -9,7 +9,7 @@ public class SinglyLinkedList<E> extends MutableLinkedList<E> {
     }
 
     @Override
-    protected List<E> makeEmptyList() {
+    public List<E> makeEmptyList() {
         return new SinglyLinkedList<>(getFillElt());
     }
 

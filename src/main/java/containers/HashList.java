@@ -15,7 +15,7 @@ public class HashList<E> extends MutableList<E> {
     }
 
     @Override
-    protected List<E> makeEmptyList() {
+    public List<E> makeEmptyList() {
         return new HashList<>(getFillElt());
     }
 

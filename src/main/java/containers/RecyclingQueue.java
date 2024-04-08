@@ -3,7 +3,7 @@ package containers;
 /*
  *    This class is kind of pointless. It is a trivial (and less efficient) variant of LinkedRingBuffer.
  */
-public class RecyclingQueue<E> extends LinkedQueue<E> {
+public class RecyclingQueue<E> extends LinkedQueue<E> implements RingBuffer<E> {
     private static final int CAPACITY = 20;
     protected Node<E> ass;
 
@@ -20,29 +20,26 @@ public class RecyclingQueue<E> extends LinkedQueue<E> {
         }
     }
 
-    private void resize() {
-        if ( rear == ass ) {
-            Node<E> more = Node.makeList(count + 1);
-            ass.setRest(more);
-            ass = more.last();
-        } else {
-            throw new IllegalStateException("resize() called without full store."); // Test?
-        }
+    @Override
+    public boolean isFull() {
+        return rear == ass;
+    }
+
+    public void doResize() {
+        Node<E> more = Node.makeList(count + 1);
+        ass.setRest(more);
+        ass = more.last();
     }
 
     @Override
-    public void enqueue(E elt) {
-        if ( rear == ass ) {
-            resize();
-        }
-
+    public void doEnqueue(E elt) {
         rear.setFirst(elt);
         rear = rear.rest();
         count++;
     }
 
     @Override
-    protected E doDequeue() { // 3 extra assignments compared to LinkedRingBuffer!
+    public E doDequeue() { // 3 extra assignments compared to LinkedRingBuffer!
         E discard = front();
 
         ass.setRest(front);  // X
