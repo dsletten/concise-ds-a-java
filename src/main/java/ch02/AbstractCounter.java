@@ -2,7 +2,7 @@ package ch02;
 
 public abstract class AbstractCounter implements Counter {
     public String toString() {
-        return String.format("[%d/%d]", index(), modulus());
+        return String.format("%s [%d/%d]", getClass().getSimpleName(), index(), modulus());
     }
 
     public static int mod(int number, int divisor) {
